@@ -1,3 +1,5 @@
+import type { FocusRunnerSettings } from './runner';
+
 export type WorkMode = 'none' | 'weekdays' | 'irregular';
 export type AfterWorkEnergy = 'low' | 'mixed' | 'decent';
 export type PreferredPrimaryBlockTime = 'morning' | 'afternoon' | 'evening';
@@ -22,6 +24,7 @@ export interface UserPrefs {
   weekIntensityDefault: WeekIntensity;
   rechargeDefaults: string[];
   notificationPreferences: Record<string, boolean>;
+  runnerSettings?: FocusRunnerSettings;
   highContrastEnabled: boolean;
   reducedMotionEnabled: boolean;
   hapticsEnabled: boolean;

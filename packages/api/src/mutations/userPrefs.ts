@@ -1,10 +1,43 @@
 import { supabase } from '../client';
-import type { UserPrefs, WorkWindow } from '@neurodivergent-flow/core';
+import type { UserPrefs, WorkWindow, FocusRunnerSettings } from '@neurodivergent-flow/core';
+import { RUNNER_SETTINGS_KEY } from '@neurodivergent-flow/core';
 
 /**
  * Map database row (snake_case) to UserPrefs (camelCase)
  */
+function extractRunnerSettings(
+  notificationPreferences: Record<string, unknown> | null | undefined
+): FocusRunnerSettings | undefined {
+  const stored = notificationPreferences?.[RUNNER_SETTINGS_KEY];
+  if (!stored || typeof stored !== 'object' || Array.isArray(stored)) {
+    return undefined;
+  }
+  const settings = stored as Record<string, unknown>;
+  if (!Array.isArray(settings.focusRitualItems)) return undefined;
+  return {
+    focusRitualItems: settings.focusRitualItems as string[],
+    focusDurationMinutes: (settings.focusDurationMinutes as number) ?? 30,
+    breakDurationMinutes: (settings.breakDurationMinutes as number) ?? 5,
+  };
+}
+
+function mapNotificationPreferences(
+  raw: Record<string, unknown> | null | undefined
+): Record<string, boolean> {
+  const prefs: Record<string, boolean> = {};
+  if (!raw) return prefs;
+  for (const [key, value] of Object.entries(raw)) {
+    if (key === RUNNER_SETTINGS_KEY) continue;
+    if (typeof value === 'boolean') prefs[key] = value;
+  }
+  return prefs;
+}
+
 function mapDbToUserPrefs(row: any): UserPrefs {
+  const rawNotificationPreferences = (row.notification_preferences ?? {}) as Record<
+    string,
+    unknown
+  >;
   return {
     id: row.id,
     userId: row.user_id,
@@ -17,7 +50,8 @@ function mapDbToUserPrefs(row: any): UserPrefs {
     downshiftReminderEnabled: row.downshift_reminder_enabled ?? true,
     weekIntensityDefault: row.week_intensity_default ?? 'normal',
     rechargeDefaults: row.recharge_defaults ?? [],
-    notificationPreferences: row.notification_preferences ?? {},
+    notificationPreferences: mapNotificationPreferences(rawNotificationPreferences),
+    runnerSettings: extractRunnerSettings(rawNotificationPreferences),
     highContrastEnabled: row.high_contrast_enabled ?? false,
     reducedMotionEnabled: row.reduced_motion_enabled ?? false,
     hapticsEnabled: row.haptics_enabled ?? true,
@@ -45,8 +79,15 @@ function mapUserPrefsToDb(prefs: Partial<UserPrefs>): any {
   if (prefs.weekIntensityDefault !== undefined)
     dbRow.week_intensity_default = prefs.weekIntensityDefault;
   if (prefs.rechargeDefaults !== undefined) dbRow.recharge_defaults = prefs.rechargeDefaults;
-  if (prefs.notificationPreferences !== undefined)
-    dbRow.notification_preferences = prefs.notificationPreferences;
+  if (prefs.notificationPreferences !== undefined) {
+    dbRow.notification_preferences = { ...prefs.notificationPreferences };
+  }
+  if (prefs.runnerSettings !== undefined) {
+    dbRow.notification_preferences = {
+      ...(dbRow.notification_preferences ?? {}),
+      [RUNNER_SETTINGS_KEY]: prefs.runnerSettings,
+    };
+  }
   if (prefs.highContrastEnabled !== undefined)
     dbRow.high_contrast_enabled = prefs.highContrastEnabled;
   if (prefs.reducedMotionEnabled !== undefined)
@@ -64,7 +105,17 @@ export async function upsertUserPrefs(
   userId: string,
   prefs: Partial<UserPrefs>
 ): Promise<UserPrefs> {
-  const dbRow = mapUserPrefsToDb(prefs);
+  let prefsToSave = prefs;
+  if (prefs.runnerSettings !== undefined && prefs.notificationPreferences === undefined) {
+    const current = await getUserPrefs(userId);
+    prefsToSave = {
+      ...prefs,
+      notificationPreferences: {
+        ...(current?.notificationPreferences ?? {}),
+      },
+    };
+  }
+  const dbRow = mapUserPrefsToDb(prefsToSave);
   dbRow.user_id = userId;
   dbRow.updated_at = new Date().toISOString();
 
