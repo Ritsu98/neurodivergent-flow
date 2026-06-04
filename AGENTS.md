@@ -4,9 +4,11 @@ Operational rules and shared context for all contributors (engineers, designers,
 product) working on this repo. This document is the source of truth for decision-
 making, scope boundaries, and quality standards.
 
-**Last updated:** [date]  
+**Last updated:** 2026-06-04  
 **Maintained by:** [lead/PM]  
 **Review cadence:** Quarterly or after major pivots
+
+**Implementation tracking:** After each MVP stage, update [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md) and checkboxes in `PRODUCT_SPEC.md` (MVP Build Plan + user stories).
 
 ---
 

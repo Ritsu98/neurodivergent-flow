@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { AppNav } from '@/components/layout/AppNav';
 import { EnergySlider } from '@/components/today/EnergySlider';
 import { PrimaryBlockCard } from '@/components/today/PrimaryBlockCard';
 import { Top3Tasks } from '@/components/today/Top3Tasks';
@@ -18,6 +20,7 @@ import {
 } from '@neurodivergent-flow/api';
 
 export default function TodayPage() {
+  const router = useRouter();
   const [energyValue, setEnergyValue] = useState<number | undefined>(undefined);
   const [dayColor, setDayColor] = useState<DayColor | undefined>(undefined);
   const [weekPlan, setWeekPlan] = useState<WeekPlan | null>(null);
@@ -110,9 +113,15 @@ export default function TodayPage() {
   };
 
   const handleStartPrimaryBlock = () => {
-    // TODO: Navigate to appropriate Runner (Stage 4)
     const theme = weekPlan?.dayThemes.find((d) => d.day === dayIndex)?.theme;
-    console.log('Start', theme);
+    if (theme === 'focus') {
+      const firstTask = tasks.find((t) => t.status !== 'done');
+      const query = firstTask ? `?taskId=${firstTask.id}` : '';
+      router.push(`/runner/focus${query}`);
+      return;
+    }
+    // Other runners ship in Stage 6
+    console.log('Runner not yet available for theme:', theme);
   };
 
   const isRedDay = dayColor === 'red';
@@ -123,15 +132,19 @@ export default function TodayPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-text-secondary">Loading...</div>
+      <div className="min-h-screen bg-surface">
+        <AppNav />
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-text-secondary">Loading...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface p-4">
-      <div className="mx-auto max-w-2xl space-y-6">
+    <div className="min-h-screen bg-surface">
+      <AppNav />
+      <div className="mx-auto max-w-2xl space-y-6 p-4">
         {/* Energy Slider */}
         <div className="rounded-lg bg-white p-6 shadow-sm">
           <EnergySlider

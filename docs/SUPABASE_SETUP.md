@@ -6,6 +6,7 @@ Instrukcja konfiguracji bazy danych Supabase dla aplikacji Neurodivergent Flow.
 
 1. [Utworzenie projektu Supabase](#1-utworzenie-projektu-supabase)
 2. [Schemat bazy danych](#2-schemat-bazy-danych)
+   - [Runner settings (Stages 3–4)](#24-runner-settings-stages-34-no-migration)
 3. [Row Level Security (RLS)](#3-row-level-security-rls)
 4. [Seed danych początkowych](#4-seed-danych-początkowych)
 5. [Konfiguracja zmiennych środowiskowych](#5-konfiguracja-zmiennych-środowiskowych)
@@ -280,6 +281,26 @@ Po wykonaniu SQL:
    - `supplements`
    - `user_supplement_plans`
    - `supplement_logs`
+
+### 2.4 Runner settings (Stages 3–4, no migration)
+
+Focus ritual items and timer lengths are stored inside existing `user_prefs.notification_preferences` JSONB under the key `_runnerSettings`:
+
+```json
+{
+  "_runnerSettings": {
+    "focusRitualItems": ["Phone away", "Water nearby", "..."],
+    "focusDurationMinutes": 30,
+    "breakDurationMinutes": 5
+  }
+}
+```
+
+The app maps this to `UserPrefs.runnerSettings` in TypeScript. No new column is required.
+
+Tables used by Stages 3–4: `energy_logs`, `tasks`, `inbox_items`, `week_plans`, `user_prefs`.
+
+See [`BUILD_PROGRESS.md`](BUILD_PROGRESS.md) and [`WEB_APP.md`](WEB_APP.md).
 
 ---
 

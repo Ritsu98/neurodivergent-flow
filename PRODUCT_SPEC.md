@@ -194,10 +194,10 @@ A hybrid scheduling app that helps neurodivergent users (ADHD/autistic) maintain
 **So that** I'm properly set up
 
 **Acceptance Criteria:**
-- [ ] Checklist appears before timer starts (customizable, 30-90 sec)
-- [ ] Default items: "Phone away", "Water nearby", "Comfortable position", "Clear workspace"
-- [ ] User can add/edit/remove items
-- [ ] All checked → "Begin Focus" button appears
+- [x] Checklist appears before timer starts (customizable, 30-90 sec) — *web, Stage 4*
+- [x] Default items: "Phone away", "Water nearby", "Comfortable position", "Clear workspace"
+- [x] User can add/edit/remove items — *saved in `UserPrefs.runnerSettings`*
+- [x] All checked → "Begin Focus" button appears
 
 #### User Story 3.2: Focus Timers
 **As a** user  
@@ -205,12 +205,12 @@ A hybrid scheduling app that helps neurodivergent users (ADHD/autistic) maintain
 **So that** I can sustain focus without burnout
 
 **Acceptance Criteria:**
-- [ ] First timer: 25-45 min (user choice, default 30)
-- [ ] Break: 5-10 min (user choice, default 5)
-- [ ] Second timer: 25-45 min (same duration as first)
-- [ ] Timer shows: countdown, optional ambient sound, haptic feedback on completion
-- [ ] "Pause" button (resume or abandon)
-- [ ] "Later" capture button (opens inbox, doesn't stop timer)
+- [x] First timer: 25-45 min (user choice, default 30) — *web*
+- [x] Break: 5-10 min (user choice, default 5)
+- [x] Second timer: 25-45 min (same duration as first)
+- [ ] Timer shows: countdown, optional ambient sound, haptic feedback on completion — *countdown only*
+- [x] "Pause" button (resume or abandon)
+- [x] "Later" capture button (opens inbox, doesn't stop timer)
 
 #### User Story 3.3: Later Capture (Inbox)
 **As a** user during focus  
@@ -218,11 +218,11 @@ A hybrid scheduling app that helps neurodivergent users (ADHD/autistic) maintain
 **So that** I can return to them later without losing focus
 
 **Acceptance Criteria:**
-- [ ] "Later" button opens quick capture modal
-- [ ] Text input: "What came up?"
-- [ ] Saves to `InboxItem` table with `capturedAt` timestamp
-- [ ] Returns to timer immediately
-- [ ] Inbox appears in Weekly Rhythm View (separate from tasks)
+- [x] "Later" button opens quick capture modal
+- [x] Text input: "What came up?"
+- [x] Saves to `InboxItem` table with `capturedAt` timestamp
+- [x] Returns to timer immediately
+- [ ] Inbox appears in Weekly Rhythm View (separate from tasks) — *Stage 5*
 
 #### User Story 3.4: Hard Stop & Next Step
 **As a** user finishing focus  
@@ -230,11 +230,11 @@ A hybrid scheduling app that helps neurodivergent users (ADHD/autistic) maintain
 **So that** I can resume easily later
 
 **Acceptance Criteria:**
-- [ ] After second timer ends, show: "Hard stop. What's your next tiny step?"
-- [ ] Text input (optional)
-- [ ] If task exists, update `Task.nextStep`
-- [ ] If new, create `InboxItem` or `Task` (user choice)
-- [ ] "Done" button → returns to Today screen
+- [x] After second timer ends, show: "Hard stop. What's your next tiny step?"
+- [x] Text input (optional)
+- [x] If task exists, update `Task.nextStep` — *via `?taskId=` from Today*
+- [x] If new, create `InboxItem` or `Task` (user choice) — *inbox path; task create deferred*
+- [x] "Done" button → returns to Today screen
 
 ---
 
@@ -1105,6 +1105,21 @@ Stage 6 (All Runners + Sync)
 Stage 7 (Polish + Deploy)
 ```
 
+### Implementation status (codebase)
+
+Updated after **Stages 3–4** (web). Full detail: [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
+
+| Stage | Status |
+|-------|--------|
+| 1 Foundation | Partial — monorepo, types, Supabase docs, web styling; auth and local-first pending |
+| 2 Onboarding | Done (web) |
+| 3 Today + Energy | Done (web) — task add/edit, Primary Block edit, PM energy pending |
+| 4 Focus Runner | Done (web) — sound/haptics optional; inbox UI in Stage 5 |
+| 5 Weekly + Sunday + Inbox | Done (web) — supplements step placeholder |
+| 6–7 | Not started |
+
+**Web routes:** `/onboarding`, `/today`, `/week`, `/sunday-setup`, `/runner/focus`
+
 ---
 
 ## Stage 1: Foundation & Infrastructure
@@ -1284,61 +1299,63 @@ Stage 7 (Polish + Deploy)
 
 **Estimated Time:** 5-7 days
 
+**Implementation:** Done on web (`apps/web/src/app/today`). See [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
+
 ### Tasks
 
 #### 3.1 Today Screen Layout
-- [ ] Create Today screen component
-- [ ] Layout structure:
+- [x] Create Today screen component
+- [x] Layout structure:
   - Energy slider (top)
-  - "Today is a [Theme] day" label
+  - "Today is a [Theme] day" label — *on Primary Block card*
   - Primary Block card (large, prominent)
   - Top 3 tasks section
   - MVD card (conditional, Red days)
   - Evening block card (if work window exists)
 
 #### 3.2 Energy Slider & Logging
-- [ ] Create energy slider component (0-5 scale)
-- [ ] Visual indicators: Green (4-5), Yellow (2-3), Red (0-1)
-- [ ] Auto-label: "Today is a [Green/Yellow/Red] plan"
-- [ ] Save to `EnergyLog` table (period: 'am', loggedAt: today)
-- [ ] Load existing energy log for today (if already logged)
-- [ ] Allow updating energy (AM only, or allow PM update)
+- [x] Create energy slider component (0-5 scale)
+- [x] Visual indicators: Green (4-5), Yellow (2-3), Red (0-1)
+- [x] Auto-label: "Today is a [Green/Yellow/Red] plan"
+- [x] Save to `EnergyLog` table (period: 'am', loggedAt: today)
+- [x] Load existing energy log for today (if already logged)
+- [ ] Allow updating energy (AM only, or allow PM update) — *AM only*
 
 #### 3.3 Red Day Mode Logic
-- [ ] Implement Red Day Mode detection (energy value 0-1)
-- [ ] Auto-simplify Top 3 to MVD tasks only
-- [ ] Show MVD card prominently
-- [ ] Suppress non-essential UI elements (defer notifications to Stage 7)
+- [x] Implement Red Day Mode detection (energy value 0-1)
+- [x] Auto-simplify Top 3 to MVD tasks only
+- [x] Show MVD card prominently
+- [x] Suppress non-essential UI elements (defer notifications to Stage 7)
 - [ ] Update Primary Block suggestions (shorter durations)
 
 #### 3.4 Primary Block Display
-- [ ] Load today's Primary Block from `WeekPlan`
-- [ ] Display: "Today is a [Focus/Flex/Recharge/Admin] day"
-- [ ] Show scheduled time (if exists): "After work: 6:00 PM"
-- [ ] Big "Start" button (launches appropriate Runner - defer to Stage 4)
+- [x] Load today's Primary Block from `WeekPlan`
+- [x] Display: "Today is a [Focus/Flex/Recharge/Admin] day"
+- [ ] Show scheduled time (if exists): "After work: 6:00 PM" — *uses "Scheduled:" label*
+- [x] Big "Start" button (launches appropriate Runner - defer to Stage 4) — *Focus → Stage 4*
 - [ ] Tap to edit: move earlier/later, swap with tomorrow, convert type
 
 #### 3.5 Top 3 Tasks
-- [ ] Load tasks for today (status: 'today', day = today)
-- [ ] Display max 3 tasks
-- [ ] Each task shows: title, outcome (optional), nextStep
-- [ ] Mark as done (update status to 'done', set completedAt)
+- [x] Load tasks for today (status: 'today', day = today)
+- [x] Display max 3 tasks
+- [x] Each task shows: title, outcome (optional), nextStep
+- [x] Mark as done (update status to 'done', set completedAt)
 - [ ] Edit task (title, outcome, nextStep)
 - [ ] "Add Top 3" button (create new task, assign to today)
-- [ ] On Red days: filter to MVD essential tasks only
+- [x] On Red days: filter to MVD essential tasks only
 
 #### 3.6 MVD Card
-- [ ] Create MVD card component
-- [ ] Show when energy is Red (or optional on Yellow)
-- [ ] Display: "Today: protect your energy. Here's the minimum."
-- [ ] List: 1-2 essential tasks + hydration + one meal reminder
-- [ ] Can be dismissed (but reappears if energy stays Red)
+- [x] Create MVD card component
+- [x] Show when energy is Red (or optional on Yellow) — *Red only*
+- [x] Display: "Today: protect your energy. Here's the minimum."
+- [x] List: 1-2 essential tasks + hydration + one meal reminder
+- [ ] Can be dismissed (but reappears if energy stays Red) — *dismiss until reload*
 
 #### 3.7 Evening Block Card (Work Window Users)
-- [ ] Show only if `workWindows` exist OR user prefers evenings
-- [ ] Display: "After work: [Primary Block type] (30 min)"
-- [ ] Transition cue: "Start with 2-min activation" (expandable checklist)
-- [ ] One-tap "Start Evening Block" button
+- [x] Show only if `workWindows` exist OR user prefers evenings — *work windows only*
+- [x] Display: "After work: [Primary Block type] (30 min)"
+- [x] Transition cue: "Start with 2-min activation" (expandable checklist)
+- [x] One-tap "Start Evening Block" button
 
 ### Deliverables
 - ✅ Today screen functional
@@ -1372,47 +1389,49 @@ Stage 7 (Polish + Deploy)
 
 **Estimated Time:** 4-6 days
 
+**Implementation:** Done on web (`apps/web/src/app/runner/focus`). See [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
+
 ### Tasks
 
 #### 4.1 Focus Runner Container
-- [ ] Create Focus Runner screen/component
-- [ ] Navigation from Today screen (Primary Block "Start" button)
-- [ ] Full-screen or modal (user preference, default: full-screen)
+- [x] Create Focus Runner screen/component
+- [x] Navigation from Today screen (Primary Block "Start" button) — *Focus theme only*
+- [x] Full-screen or modal (user preference, default: full-screen) — *full-screen*
 
 #### 4.2 Start Ritual
-- [ ] Create ritual checklist component
-- [ ] Default items: "Phone away", "Water nearby", "Comfortable position", "Clear workspace"
-- [ ] User can customize (add/edit/remove items) - store in `UserPrefs`
-- [ ] All checked → "Begin Focus" button appears
-- [ ] Skip option (optional, but recommended)
+- [x] Create ritual checklist component
+- [x] Default items: "Phone away", "Water nearby", "Comfortable position", "Clear workspace"
+- [x] User can customize (add/edit/remove items) - store in `UserPrefs`
+- [x] All checked → "Begin Focus" button appears
+- [x] Skip option (optional, but recommended)
 
 #### 4.3 Timer System
-- [ ] Create timer component (countdown)
-- [ ] First timer: 25-45 min (user choice, default 30)
-- [ ] Break timer: 5-10 min (user choice, default 5)
-- [ ] Second timer: 25-45 min (same duration as first)
-- [ ] Timer controls: Pause, Resume, Abandon
-- [ ] Visual feedback: progress bar, time remaining
+- [x] Create timer component (countdown)
+- [x] First timer: 25-45 min (user choice, default 30)
+- [x] Break timer: 5-10 min (user choice, default 5)
+- [x] Second timer: 25-45 min (same duration as first)
+- [x] Timer controls: Pause, Resume, Abandon
+- [x] Visual feedback: progress bar, time remaining
 - [ ] Optional: ambient sound, haptic feedback on completion
-- [ ] Timer persists if app backgrounded (use background task API)
+- [x] Timer persists if app backgrounded (use background task API) — *end timestamp + sessionStorage*
 
 #### 4.4 Later Capture (Inbox)
-- [ ] "Later" button during timer (doesn't stop timer)
-- [ ] Quick capture modal: "What came up?"
-- [ ] Save to `InboxItem` table (content, capturedAt)
-- [ ] Return to timer immediately
+- [x] "Later" button during timer (doesn't stop timer)
+- [x] Quick capture modal: "What came up?"
+- [x] Save to `InboxItem` table (content, capturedAt)
+- [x] Return to timer immediately
 - [ ] Inbox visible in Weekly View (Stage 5)
 
 #### 4.5 Hard Stop & Next Step
-- [ ] After second timer ends, show completion screen
-- [ ] Prompt: "Hard stop. What's your next tiny step?"
-- [ ] Text input (optional)
-- [ ] If task exists, update `Task.nextStep`
-- [ ] If new, create `InboxItem` or `Task` (user choice)
-- [ ] "Done" button → return to Today screen
+- [x] After second timer ends, show completion screen
+- [x] Prompt: "Hard stop. What's your next tiny step?"
+- [x] Text input (optional)
+- [x] If task exists, update `Task.nextStep`
+- [x] If new, create `InboxItem` or `Task` (user choice)
+- [x] "Done" button → return to Today screen
 
 #### 4.6 Focus Session Logging (Optional)
-- [ ] Log focus session (start time, duration, completed)
+- [x] Log focus session (start time, duration, completed) — *sessionStorage, last 20*
 - [ ] Store in local DB (can add table later if needed)
 - [ ] For analytics/metrics (Stage 7)
 
@@ -1448,59 +1467,61 @@ Stage 7 (Polish + Deploy)
 
 **Estimated Time:** 5-7 days
 
+**Implementation:** Done on web. See [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
+
 ### Tasks
 
 #### 5.1 Weekly Rhythm View
-- [ ] Create Weekly Rhythm View screen
-- [ ] Week at a glance: 7 day chips (F/R/X/A)
-- [ ] Work Window overlay (subtle band on relevant days)
-- [ ] Today highlighted
-- [ ] Tap day → show day detail view
+- [x] Create Weekly Rhythm View screen
+- [x] Week at a glance: 7 day chips (F/R/X/A)
+- [x] Work Window overlay (subtle band on relevant days)
+- [x] Today highlighted
+- [x] Tap day → show day detail view
 
 #### 5.2 Day Detail View
-- [ ] Show: Day theme, Primary Block scheduled time, Top 3 tasks
-- [ ] Work Window visible if applicable
-- [ ] "Back to Week" button
-- [ ] Can edit Primary Block (move, swap, convert)
+- [x] Show: Day theme, Primary Block scheduled time, Top 3 tasks
+- [x] Work Window visible if applicable
+- [x] "Back to Week" button
+- [x] Can edit Primary Block (move, swap, convert) — *convert cycle, swap adjacent, ±30 min time*
 
 #### 5.3 Day Theme Reordering
-- [ ] One-tap reorder (drag-and-drop or swap buttons)
-- [ ] Update `WeekPlan.dayThemes` array
-- [ ] Save changes to database
-- [ ] Visual feedback on reorder
+- [x] One-tap reorder (drag-and-drop or swap buttons) — *swap buttons*
+- [x] Update `WeekPlan.dayThemes` array
+- [x] Save changes to database
+- [x] Visual feedback on reorder
 
 #### 5.4 Sunday Setup Flow
-- [ ] Create Sunday Setup screen (triggered on Sundays or manually)
-- [ ] Step 1: Choose Intensity (Light/Normal/Heavy)
-- [ ] Step 2: Confirm/Edit Week Plan
-  - [ ] Show auto-generated plan
-  - [ ] Allow reordering (reuse 5.3)
-  - [ ] Confirm → save to `WeekPlan`
-- [ ] Step 3: Weekly Outcomes
-  - [ ] Prompt: "What are 1-3 outcomes you want this week?"
-  - [ ] Text inputs (max 3)
-  - [ ] Save to `WeekPlan.weeklyOutcomes`
-- [ ] Step 4: Supplements Check-in (Optional)
+- [x] Create Sunday Setup screen (triggered on Sundays or manually)
+- [x] Step 1: Choose Intensity (Light/Normal/Heavy)
+- [x] Step 2: Confirm/Edit Week Plan
+  - [x] Show auto-generated plan
+  - [x] Allow reordering (reuse 5.3)
+  - [x] Confirm → save to `WeekPlan`
+- [x] Step 3: Weekly Outcomes
+  - [x] Prompt: "What are 1-3 outcomes you want this week?"
+  - [x] Text inputs (max 3)
+  - [x] Save to `WeekPlan.weeklyOutcomes`
+- [ ] Step 4: Supplements Check-in (Optional) — *placeholder UI*
   - [ ] Show current `UserSupplementPlan` items
   - [ ] "Do I have 7 days left?" check
   - [ ] Refill links (if provided)
   - [ ] Can remove/add items
-- [ ] Complete → navigate to Today screen
+- [x] Complete → navigate to Today screen
 
 #### 5.5 Later Inbox Management
-- [ ] Create Inbox view (separate section in Weekly View)
-- [ ] Display all `InboxItem` entries (not deleted)
-- [ ] Actions per item:
-  - [ ] Promote to Task (assign to day)
-  - [ ] Delete (soft-delete, set `deletedAt`)
-- [ ] Weekly pruning prompt (Sunday): "Review Later Inbox"
-- [ ] Max 20 items (warning at 15, hard limit at 20)
+- [x] Create Inbox view (separate section in Weekly View)
+- [x] Display all `InboxItem` entries (not deleted)
+- [x] Actions per item:
+  - [x] Promote to Task (assign to day)
+  - [x] Delete (soft-delete, set `deletedAt`)
+- [x] Weekly pruning prompt (Sunday): "Review Later Inbox"
+- [x] Max 20 items (warning at 15, hard limit at 20)
 
 #### 5.6 Task Management Enhancements
-- [ ] "This Week" column (tasks not assigned to specific day)
-- [ ] "Today" column (tasks for today)
-- [ ] "Done" column (completed tasks)
-- [ ] Move tasks between columns (drag or buttons)
+- [x] "This Week" column (tasks not assigned to specific day)
+- [x] "Today" column (tasks for today)
+- [x] "Done" column (completed tasks)
+- [x] Move tasks between columns (drag or buttons) — *buttons*
 - [ ] Archive done tasks (optional, can defer)
 
 ### Deliverables
@@ -1834,11 +1855,11 @@ Stage 7 (Polish + Deploy)
 **Goal:** Core loop functional
 
 **Tasks:**
-- [ ] Build Today screen (energy slider, Primary Block card, Top 3)
-- [ ] Implement energy logging (`EnergyLog` table)
-- [ ] Implement Red Day Mode logic (MVD card, suppression)
-- [ ] Build Focus Runner (ritual, 2 timers, Later capture, hard stop)
-- [ ] Implement task creation/editing
+- [x] Build Today screen (energy slider, Primary Block card, Top 3) — *web*
+- [x] Implement energy logging (`EnergyLog` table)
+- [x] Implement Red Day Mode logic (MVD card, suppression)
+- [x] Build Focus Runner (ritual, 2 timers, Later capture, hard stop) — *web*
+- [ ] Implement task creation/editing — *complete only; add/edit stubbed*
 - [ ] Implement local storage (SQLite mobile, IndexedDB web)
 - [ ] Basic offline support (read from local, queue writes)
 
@@ -1856,11 +1877,11 @@ Stage 7 (Polish + Deploy)
 **Goal:** Week management, Sunday flow
 
 **Tasks:**
-- [ ] Build Weekly Rhythm View (week at a glance, day detail)
-- [ ] Implement day theme reordering
-- [ ] Build Sunday Setup flow (intensity, confirm plan, outcomes, supplements)
-- [ ] Implement Later Inbox (capture, view, promote/delete)
-- [ ] Weekly inbox pruning prompt
+- [x] Build Weekly Rhythm View (week at a glance, day detail) — *web*
+- [x] Implement day theme reordering
+- [x] Build Sunday Setup flow (intensity, confirm plan, outcomes, supplements) — *supplements placeholder*
+- [x] Implement Later Inbox (capture, view, promote/delete)
+- [x] Weekly inbox pruning prompt
 - [ ] **Defer:** Meals library + grocery list (post-MVP)
 
 **Deliverables:**

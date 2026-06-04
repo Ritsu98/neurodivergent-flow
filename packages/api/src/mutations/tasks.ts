@@ -74,6 +74,7 @@ export async function getTasks(
     day?: number;
     status?: TaskStatus;
     isMvdEssential?: boolean;
+    weekPlanId?: string;
   }
 ): Promise<Task[]> {
   let query = supabase
@@ -89,6 +90,9 @@ export async function getTasks(
   }
   if (filters?.isMvdEssential !== undefined) {
     query = query.eq('is_mvd_essential', filters.isMvdEssential);
+  }
+  if (filters?.weekPlanId !== undefined) {
+    query = query.eq('week_plan_id', filters.weekPlanId);
   }
 
   const { data, error } = await query.order('created_at', { ascending: false });

@@ -84,7 +84,7 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 4. **Set up Supabase**
 
 - Create a new Supabase project
-- Run the database migrations (see `docs/supabase-schema.sql` - to be added)
+- Run the SQL schema from [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md)
 - Configure Row Level Security (RLS) policies
 
 5. **Start development servers**
@@ -120,9 +120,9 @@ pnpm --filter @neurodivergent-flow/mobile dev
 Shared TypeScript types, Zod schemas, and business logic.
 
 **Exports:**
-- Types: `UserPrefs`, `WeekPlan`, `Task`, `EnergyLog`, `InboxItem`, `Supplement`, etc.
-- Schemas: Zod validation schemas for all types
-- Logic: Week plan generation, energy adaptation, etc. (to be added)
+- Types: `UserPrefs`, `WeekPlan`, `Task`, `EnergyLog`, `InboxItem`, `FocusRunnerSettings`, etc.
+- Schemas: Zod validation schemas (partial; expanding with forms)
+- Logic: `weekGeneration`, `focusTimer`, `runnerPrefs`
 
 ### `@neurodivergent-flow/api`
 
@@ -130,8 +130,8 @@ Supabase client and data access layer.
 
 **Exports:**
 - `supabase` - Supabase client instance
+- Mutations: `userPrefs`, `weekPlan`, `energyLog`, `tasks`, `inbox` (full CRUD for inbox read/delete/promote)
 - Query hooks (TanStack Query) - to be added
-- Mutation hooks - to be added
 
 ### `@neurodivergent-flow/ui`
 
@@ -145,7 +145,7 @@ Next.js web application.
 
 - PWA-ready
 - Tailwind CSS styling
-- Server-side rendering support
+- Routes: `/onboarding`, `/today`, `/week`, `/sunday-setup`, `/runner/focus` (see [`docs/WEB_APP.md`](docs/WEB_APP.md))
 
 ### `@neurodivergent-flow/mobile`
 
@@ -204,9 +204,11 @@ See `PRODUCT_SPEC.md` for complete database schema. Key tables:
 
 ## 📚 Documentation
 
-- **Product Specification**: See `PRODUCT_SPEC.md` for complete feature specs
-- **Agent Rules**: See `AGENTS.md` for development guidelines and principles
-- **Stage Plan**: See `PRODUCT_SPEC.md` for detailed build stages
+- **Product Specification**: [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md) — features and full stage plan
+- **Build progress**: [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md) — what's shipped per stage (updated after Stages 3–4)
+- **Web app guide**: [`docs/WEB_APP.md`](docs/WEB_APP.md) — routes, components, env
+- **Supabase setup**: [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md) — database SQL and RLS
+- **Agent rules**: [`AGENTS.md`](AGENTS.md) — engineering principles
 
 ## 🧪 Testing
 
@@ -246,6 +248,19 @@ Built with compassion for the neurodivergent community. Designed to reduce decis
 
 ---
 
-**Status**: 🚧 In Development (Stage 1: Foundation)
+## 📍 Implementation status
 
-For detailed build plan, see `PRODUCT_SPEC.md`.
+| Stage | Status | Notes |
+|-------|--------|-------|
+| 1 Foundation | Partial | Monorepo, types, API, web Tailwind; auth + offline storage pending |
+| 2 Onboarding | Done (web) | `/onboarding` |
+| 3 Today + Energy | Done (web) | `/today`; task add/edit still stubbed |
+| 4 Focus Runner | Done (web) | `/runner/focus` |
+| 5 Weekly + Sunday + Inbox | Done (web) | `/week`, `/sunday-setup` |
+| 6 All Runners + Sync | Next | — |
+
+**Platform:** Web features above are implemented; mobile app is scaffold-only.
+
+Details, test checklists, and gaps: [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
+
+**Status**: 🚧 In Development — **Stage 6 next** (All Runners + Sync)
