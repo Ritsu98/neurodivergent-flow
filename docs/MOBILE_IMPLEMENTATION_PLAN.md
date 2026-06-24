@@ -206,9 +206,9 @@ M7 EAS build + QA
 
 ### Shared mobile work
 
-- [ ] `useCountdownTimer` — use `AppState` + persisted end timestamp (AsyncStorage or SQLite), not `sessionStorage`.
-- [ ] `SprintTimer`, `SprintChecklist`, `NextStepCapture` (port from `apps/web/src/components/runner/shared/`).
-- [ ] `createInboxItem` for Later capture.
+- [x] `useCountdownTimer` — use `AppState` + persisted end timestamp (AsyncStorage or SQLite), not `sessionStorage`.
+- [x] `SprintTimer`, `SprintChecklist`, `NextStepCapture` (port from `apps/web/src/components/runner/shared/`).
+- [x] `createInboxItem` for Later capture.
 - [ ] Haptic feedback on timer complete (`expo-haptics`) — respect `hapticsEnabled` pref.
 
 ### Testing

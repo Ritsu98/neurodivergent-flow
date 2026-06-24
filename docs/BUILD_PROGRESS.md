@@ -22,6 +22,7 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | M0 | Mobile foundation | Done | Mobile — Expo Router, NativeWind, placeholders |
 | M1 | Onboarding | Done | Mobile — 5-step flow, prefs + week plan |
 | M2 | Today + energy | Done | Mobile — energy, primary block, Top 3, MVD |
+| M3 | All runners | Done | Mobile — Focus, Recharge, Flex, Admin (no haptics yet) |
 
 ---
 
