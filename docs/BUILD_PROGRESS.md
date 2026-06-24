@@ -3,7 +3,7 @@
 Living record of MVP implementation status. Aligned with the stage plan in `PRODUCT_SPEC.md`.
 
 **Last updated:** 2026-06-04  
-**Current focus:** Stage 7 — Polish + Deploy  
+**Current focus:** MVP web complete — Stage 8 buffer / mobile optional  
 **Primary platform:** Web (`apps/web`) — mobile scaffold exists, features not ported yet
 
 ---
@@ -18,7 +18,7 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | 4 | Focus Runner | Done (web) | Web |
 | 5 | Weekly View + Sunday Setup + Inbox | Done (web) | Web |
 | 6 | All Runners + Sync | Partial (web) | Web — runners done; sync foundation |
-| 7 | Polish + Deploy | Not started | — |
+| 7 | Polish + Deploy | Done (web) | Web |
 
 ---
 
@@ -34,7 +34,7 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | `/runner/flex` | Flex Sprint |
 | `/runner/admin` | Admin Sprint |
 | `/week` | Weekly rhythm, Later inbox, task board |
-| `/sunday-setup` | Sunday Minimum — 4-step weekly planning flow |
+| `/settings` | Accessibility, notifications, analytics opt-in |
 
 ---
 
@@ -203,9 +203,36 @@ Focus ritual items and timer lengths are stored on `UserPrefs.runnerSettings`, p
 - Promoted inbox items remain in list (linked via `promotedToTaskId`)
 - Mobile not started
 
+| 7 | Polish + Deploy | Done (web) | Web |
+| 8 | Buffer + optional | Not started | — |
+
 ---
 
-## Manual test checklist (Stages 3–5)
+## Stage 7: Polish + Deploy — done (web)
+
+### Implemented
+
+| Area | Location |
+|------|----------|
+| Settings | `/settings` — accessibility, notifications, analytics opt-in |
+| High contrast + reduced motion | `UserPrefsProvider` + `globals.css` |
+| Web notifications | `webNotifications.ts` — permission, anchors, Red day suppression, max 2/day |
+| Analytics (opt-in) | `lib/analytics.ts` — PostHog capture API, no sensitive text |
+| PWA manifest | `public/manifest.json` |
+| Deploy config | `vercel.json`, `docs/DEPLOYMENT.md`, `.env.example` |
+| A11y polish | skip link, aria on nav/slider, min tap targets, security headers |
+
+### Gaps
+
+- Mobile Expo notifications (Stage 7.1 mobile)
+- Service worker for background web notifications
+- PWA icons (add `icon-192.png`, `icon-512.png`)
+- EAS mobile build not configured
+- Full QA matrix / automated tests
+
+---
+
+## Manual test checklist (Stages 3–7)
 
 Prerequisites: Supabase project configured, `.env.local` in `apps/web`, schema from `docs/SUPABASE_SETUP.md`, test user row matching `temp-user-id` or swap to real auth when available.
 
@@ -227,6 +254,9 @@ Prerequisites: Supabase project configured, `.env.local` in `apps/web`, schema f
 16. **Flex:** Zone select → sprint checklist + timer → next step capture.
 17. **Admin:** Multi-category → sprint → next step capture.
 18. **Today routing:** Each theme opens correct `/runner/*` path.
+19. **Settings:** Toggle high contrast / reduced motion; enable notifications.
+20. **Red day notifications:** Energy 0–1 suppresses anchor notifications unless override on.
+21. **Analytics:** Opt-in only; events fire after toggle (check network if PostHog key set).
 
 ---
 
@@ -242,13 +272,9 @@ Prerequisites: Supabase project configured, `.env.local` in `apps/web`, schema f
 
 ---
 
-## Next: Stage 6
+## Next: Stage 8 (optional)
 
-Per `PRODUCT_SPEC.md`:
-
-- Recharge, Flex, Admin runners
-- Local-first sync (IndexedDB web, SQLite mobile)
-- Offline read + queued writes
+Per `PRODUCT_SPEC.md`: body-doubling presence, bug fixes, performance, user feedback.
 
 ---
 

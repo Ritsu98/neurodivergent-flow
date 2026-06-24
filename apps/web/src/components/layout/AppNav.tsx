@@ -29,7 +29,10 @@ export function AppNav({ showSundayBanner = true }: AppNavProps) {
           </Link>
         </div>
       )}
-      <nav className="mx-auto flex max-w-2xl items-center gap-2 p-4">
+      <nav
+        className="mx-auto flex max-w-2xl items-center gap-2 p-4"
+        aria-label="Main navigation"
+      >
         <Link href="/today" className={linkClass('/today')}>
           Today
         </Link>
@@ -38,6 +41,9 @@ export function AppNav({ showSundayBanner = true }: AppNavProps) {
         </Link>
         <Link href="/sunday-setup" className={linkClass('/sunday-setup')}>
           Sunday Setup
+        </Link>
+        <Link href="/settings" className={`${linkClass('/settings')} ml-auto`}>
+          Settings
         </Link>
       </nav>
     </header>

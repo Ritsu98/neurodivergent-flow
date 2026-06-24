@@ -70,6 +70,11 @@ export function EnergySlider({ initialValue, dayColor, onSave, disabled }: Energ
           value={value}
           onChange={(e) => handleChange(Number(e.target.value))}
           disabled={disabled}
+          aria-label="Energy level from 0 to 5"
+          aria-valuemin={0}
+          aria-valuemax={5}
+          aria-valuenow={value}
+          aria-valuetext={`${currentLabel}, ${value} out of 5`}
           className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 disabled:cursor-not-allowed"
           style={{
             background: `linear-gradient(to right, ${currentColor.replace('bg-', '')} 0%, ${currentColor.replace('bg-', '')} ${(value / 5) * 100}%, #e5e7eb ${(value / 5) * 100}%, #e5e7eb 100%)`,

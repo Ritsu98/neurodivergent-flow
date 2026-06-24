@@ -72,10 +72,11 @@ function mapUserPrefsToDb(prefs: Partial<UserPrefs>): any {
   if (prefs.rechargeDefaults !== undefined) dbRow.recharge_defaults = prefs.rechargeDefaults;
   if (prefs.notificationPreferences !== undefined) {
     dbRow.notification_preferences = { ...prefs.notificationPreferences };
-  }
-  if (prefs.runnerSettings !== undefined) {
+    if (prefs.runnerSettings !== undefined) {
+      dbRow.notification_preferences[RUNNER_SETTINGS_KEY] = prefs.runnerSettings;
+    }
+  } else if (prefs.runnerSettings !== undefined) {
     dbRow.notification_preferences = {
-      ...(dbRow.notification_preferences ?? {}),
       [RUNNER_SETTINGS_KEY]: prefs.runnerSettings,
     };
   }
@@ -96,16 +97,16 @@ export async function upsertUserPrefs(
   userId: string,
   prefs: Partial<UserPrefs>
 ): Promise<UserPrefs> {
-  let prefsToSave = prefs;
-  if (prefs.runnerSettings !== undefined && prefs.notificationPreferences === undefined) {
-    const current = await getUserPrefs(userId);
-    prefsToSave = {
-      ...prefs,
-      notificationPreferences: {
-        ...(current?.notificationPreferences ?? {}),
-      },
-    };
+  const current = await getUserPrefs(userId);
+  const prefsToSave: Partial<UserPrefs> = { ...prefs };
+
+  if (prefs.notificationPreferences !== undefined && prefs.runnerSettings === undefined && current?.runnerSettings) {
+    prefsToSave.runnerSettings = current.runnerSettings;
   }
+  if (prefs.runnerSettings !== undefined && prefs.notificationPreferences === undefined) {
+    prefsToSave.notificationPreferences = { ...(current?.notificationPreferences ?? {}) };
+  }
+
   const dbRow = mapUserPrefsToDb(prefsToSave);
   dbRow.user_id = userId;
   dbRow.updated_at = new Date().toISOString();

@@ -21,6 +21,7 @@ import {
   updateTask,
   getTasks,
 } from '@neurodivergent-flow/api';
+import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
 
 const USER_ID = 'temp-user-id';
 const SESSION_LOG_KEY = 'nf_focus_session_log';
@@ -143,6 +144,7 @@ export function FocusRunnerContent() {
         }
       }
       logSessionComplete();
+      trackEvent(AnalyticsEvents.focusSessionComplete);
     } catch (error) {
       console.error('Failed to save next step:', error);
     }

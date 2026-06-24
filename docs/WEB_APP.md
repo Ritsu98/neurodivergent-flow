@@ -10,7 +10,7 @@ Quick reference for the Next.js web app (`apps/web`).
 | `/onboarding` | `src/app/onboarding/page.tsx` | First-run setup |
 | `/today` | `src/app/today/page.tsx` | Main daily hub |
 | `/week` | `src/app/week/page.tsx` | Weekly rhythm, Later inbox, task board |
-| `/sunday-setup` | `src/app/sunday-setup/page.tsx` | Sunday Minimum (4-step weekly planning) |
+| `/settings` | `src/app/settings/page.tsx` | Accessibility, notifications, privacy |
 | `/runner/focus` | `src/app/runner/focus/page.tsx` | Focus Runner |
 | `/runner/recharge` | `src/app/runner/recharge/page.tsx` | Recharge Runner |
 | `/runner/flex` | `src/app/runner/flex/page.tsx` | Flex Sprint (`?duration=5` for return ramp) |

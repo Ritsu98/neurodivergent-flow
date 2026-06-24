@@ -207,7 +207,7 @@ See `PRODUCT_SPEC.md` for complete database schema. Key tables:
 - **Product Specification**: [`PRODUCT_SPEC.md`](PRODUCT_SPEC.md) — features and full stage plan
 - **Build progress**: [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md) — what's shipped per stage (updated after Stages 3–4)
 - **Web app guide**: [`docs/WEB_APP.md`](docs/WEB_APP.md) — routes, components, env
-- **Supabase setup**: [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md) — database SQL and RLS
+- **Deployment**: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 - **Agent rules**: [`AGENTS.md`](AGENTS.md) — engineering principles
 
 ## 🧪 Testing
@@ -264,4 +264,4 @@ Built with compassion for the neurodivergent community. Designed to reduce decis
 
 Details, test checklists, and gaps: [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
 
-**Status**: 🚧 In Development — **Stage 7 next** (Polish + Deploy)
+**Status**: ✅ MVP web complete — optional Stage 8 / mobile parity

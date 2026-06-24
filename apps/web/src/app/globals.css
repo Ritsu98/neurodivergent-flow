@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html.high-contrast {
+    --hc-border: #000000;
+  }
+
+  html.high-contrast body {
+    @apply bg-white text-black;
+  }
+
+  html.high-contrast .bg-surface {
+    @apply bg-white;
+  }
+
+  html.high-contrast .text-text-secondary,
+  html.high-contrast .text-text-muted {
+    @apply text-gray-800;
+  }
+
+  html.high-contrast .border-gray-200,
+  html.high-contrast .border-gray-300 {
+    border-color: #000000;
+  }
+
+  html.reduced-motion *,
+  html.reduced-motion *::before,
+  html.reduced-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary-500 focus:px-4 focus:py-2 focus:text-white;
+  }
+
+  .tap-target {
+    @apply min-h-12 min-w-12;
+  }
+}

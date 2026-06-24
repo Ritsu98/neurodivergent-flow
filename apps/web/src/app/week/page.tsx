@@ -145,7 +145,7 @@ export default function WeekPage() {
   return (
     <div className="min-h-screen bg-surface">
       <AppNav />
-      <main className="mx-auto max-w-2xl space-y-6 p-4">
+      <main className="mx-auto max-w-2xl space-y-6 p-4" id="main-content">
         <div className="flex gap-2">
           <button type="button" className={tabClass('week')} onClick={() => { setTab('week'); setSelectedDay(null); }}>
             Week

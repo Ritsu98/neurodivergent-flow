@@ -19,6 +19,7 @@ import {
   createTask,
   updateTask,
 } from '@neurodivergent-flow/api';
+import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
 
 export default function TodayPage() {
   const router = useRouter();
@@ -84,10 +85,10 @@ export default function TodayPage() {
     try {
       await upsertEnergyLog(userId, today, 'am', value);
       setEnergyValue(value);
-      // Update day color
       if (value >= 4) setDayColor('green');
       else if (value >= 2) setDayColor('yellow');
       else setDayColor('red');
+      trackEvent(AnalyticsEvents.energyLogged, { value, day_color: value >= 4 ? 'green' : value >= 2 ? 'yellow' : 'red' });
     } catch (error) {
       console.error('Failed to save energy:', error);
       throw error;
@@ -118,6 +119,7 @@ export default function TodayPage() {
     if (!theme) return;
     const firstTask = tasks.find((t) => t.status !== 'done');
     router.push(getRunnerPath(theme, firstTask?.id));
+    trackEvent(AnalyticsEvents.runnerStarted, { theme });
   };
 
   const isRedDay = dayColor === 'red';
@@ -140,7 +142,7 @@ export default function TodayPage() {
   return (
     <div className="min-h-screen bg-surface">
       <AppNav />
-      <div className="mx-auto max-w-2xl space-y-6 p-4">
+      <div className="mx-auto max-w-2xl space-y-6 p-4" id="main-content">
         {/* Energy Slider */}
         <div className="rounded-lg bg-white p-6 shadow-sm">
           <EnergySlider

@@ -12,6 +12,7 @@ import {
   getWeekPlan,
   updateWeekPlan,
 } from '@neurodivergent-flow/api';
+import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
 
 const USER_ID = 'temp-user-id';
 const TOTAL_STEPS = 4;
@@ -83,6 +84,7 @@ export default function SundaySetupPage() {
       }
 
       router.push('/today');
+      trackEvent(AnalyticsEvents.sundaySetupComplete, { intensity });
     } catch (error) {
       console.error('Sunday setup failed:', error);
       alert('Could not save your week plan. Please try again.');
