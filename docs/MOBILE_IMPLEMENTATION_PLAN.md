@@ -225,13 +225,13 @@ M7 EAS build + QA
 
 ### Tasks
 
-- [ ] `WeekGlance` — 7 chips, work-window band, today highlight.
-- [ ] `DayDetailView` — theme, tasks, swap/convert/time shift.
-- [ ] `WeekPlanEditor` — adjacent day swap.
-- [ ] `InboxPanel` — promote, soft-delete, limits (15 warn / 20 max).
-- [ ] `TaskBoard` — This Week / Today / Done columns.
-- [ ] `SundaySetup` — 4 steps, `getSundaySetupStartDate`.
-- [ ] Tab or stack: Week screen with sub-tabs (Week / Later / Tasks) like web.
+- [x] `WeekGlance` — 7 chips, work-window band, today highlight.
+- [x] `DayDetailView` — theme, tasks, swap/convert/time shift.
+- [x] `WeekPlanEditor` — adjacent day swap.
+- [x] `InboxPanel` — promote, soft-delete, limits (15 warn / 20 max).
+- [x] `TaskBoard` — This Week / Today / Done columns.
+- [x] `SundaySetup` — 4 steps, `getSundaySetupStartDate`.
+- [x] Tab or stack: Week screen with sub-tabs (Week / Later / Tasks) like web.
 
 ### Testing
 
