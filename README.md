@@ -257,10 +257,11 @@ Built with compassion for the neurodivergent community. Designed to reduce decis
 | 3 Today + Energy | Done (web) | `/today`; task add/edit still stubbed |
 | 4 Focus Runner | Done (web) | `/runner/focus` |
 | 5 Weekly + Sunday + Inbox | Done (web) | `/week`, `/sunday-setup` |
-| 6 All Runners + Sync | Next | — |
+| 6 All Runners + Sync | Partial (web) | All 4 runners; TanStack Query + offline queue foundation |
+| 7 Polish + Deploy | Next | — |
 
 **Platform:** Web features above are implemented; mobile app is scaffold-only.
 
 Details, test checklists, and gaps: [`docs/BUILD_PROGRESS.md`](docs/BUILD_PROGRESS.md).
 
-**Status**: 🚧 In Development — **Stage 6 next** (All Runners + Sync)
+**Status**: 🚧 In Development — **Stage 7 next** (Polish + Deploy)

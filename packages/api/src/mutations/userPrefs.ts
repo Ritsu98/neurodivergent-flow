@@ -1,24 +1,15 @@
 import { supabase } from '../client';
-import type { UserPrefs, WorkWindow, FocusRunnerSettings } from '@neurodivergent-flow/core';
+import type { UserPrefs, WorkWindow } from '@neurodivergent-flow/core';
 import { RUNNER_SETTINGS_KEY } from '@neurodivergent-flow/core';
 
-/**
- * Map database row (snake_case) to UserPrefs (camelCase)
- */
 function extractRunnerSettings(
   notificationPreferences: Record<string, unknown> | null | undefined
-): FocusRunnerSettings | undefined {
+): UserPrefs['runnerSettings'] {
   const stored = notificationPreferences?.[RUNNER_SETTINGS_KEY];
   if (!stored || typeof stored !== 'object' || Array.isArray(stored)) {
     return undefined;
   }
-  const settings = stored as Record<string, unknown>;
-  if (!Array.isArray(settings.focusRitualItems)) return undefined;
-  return {
-    focusRitualItems: settings.focusRitualItems as string[],
-    focusDurationMinutes: (settings.focusDurationMinutes as number) ?? 30,
-    breakDurationMinutes: (settings.breakDurationMinutes as number) ?? 5,
-  };
+  return stored as UserPrefs['runnerSettings'];
 }
 
 function mapNotificationPreferences(

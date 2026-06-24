@@ -9,6 +9,7 @@ import { Top3Tasks } from '@/components/today/Top3Tasks';
 import { MvdCard } from '@/components/today/MvdCard';
 import { EveningBlockCard } from '@/components/today/EveningBlockCard';
 import type { EnergyLog, WeekPlan, Task, DayColor, DayTheme } from '@neurodivergent-flow/core';
+import { getRunnerPath } from '@neurodivergent-flow/core';
 import {
   getEnergyLog,
   upsertEnergyLog,
@@ -113,15 +114,10 @@ export default function TodayPage() {
   };
 
   const handleStartPrimaryBlock = () => {
-    const theme = weekPlan?.dayThemes.find((d) => d.day === dayIndex)?.theme;
-    if (theme === 'focus') {
-      const firstTask = tasks.find((t) => t.status !== 'done');
-      const query = firstTask ? `?taskId=${firstTask.id}` : '';
-      router.push(`/runner/focus${query}`);
-      return;
-    }
-    // Other runners ship in Stage 6
-    console.log('Runner not yet available for theme:', theme);
+    const theme = weekPlan?.dayThemes.find((d) => d.day === dayIndex)?.theme as DayTheme | undefined;
+    if (!theme) return;
+    const firstTask = tasks.find((t) => t.status !== 'done');
+    router.push(getRunnerPath(theme, firstTask?.id));
   };
 
   const isRedDay = dayColor === 'red';

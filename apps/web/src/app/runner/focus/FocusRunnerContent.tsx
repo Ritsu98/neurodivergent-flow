@@ -12,6 +12,7 @@ import type { FocusRunnerPhase, FocusRunnerSettings, Task } from '@neurodivergen
 import {
   FOCUS_TIMER_STORAGE_KEY,
   getFocusRunnerSettings,
+  mergeRunnerSettings,
 } from '@neurodivergent-flow/core';
 import {
   getUserPrefs,
@@ -94,7 +95,10 @@ export function FocusRunnerContent() {
     setSettings(next);
     setRitualItems(next.focusRitualItems);
     try {
-      await upsertUserPrefs(USER_ID, { runnerSettings: next });
+      const prefs = await getUserPrefs(USER_ID);
+      await upsertUserPrefs(USER_ID, {
+        runnerSettings: mergeRunnerSettings(prefs, { focus: next }),
+      });
     } catch (error) {
       console.error('Failed to save runner settings:', error);
     }

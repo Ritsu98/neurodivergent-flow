@@ -3,7 +3,7 @@
 Living record of MVP implementation status. Aligned with the stage plan in `PRODUCT_SPEC.md`.
 
 **Last updated:** 2026-06-04  
-**Current focus:** Stage 6 — All Runners + Sync  
+**Current focus:** Stage 7 — Polish + Deploy  
 **Primary platform:** Web (`apps/web`) — mobile scaffold exists, features not ported yet
 
 ---
@@ -17,7 +17,7 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | 3 | Today Screen + Energy Logging | Done (web) | Web |
 | 4 | Focus Runner | Done (web) | Web |
 | 5 | Weekly View + Sunday Setup + Inbox | Done (web) | Web |
-| 6 | All Runners + Sync | Not started | — |
+| 6 | All Runners + Sync | Partial (web) | Web — runners done; sync foundation |
 | 7 | Polish + Deploy | Not started | — |
 
 ---
@@ -29,9 +29,11 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | `/` | Landing placeholder |
 | `/onboarding` | 5-step onboarding wizard |
 | `/today` | Today screen (energy, Primary Block, Top 3, MVD, evening block) |
-| `/runner/focus` | Focus Runner (ritual → 2 focus blocks + break → hard stop) |
-| `/runner/focus?taskId={uuid}` | Focus Runner with linked task for hard-stop next step |
-| `/week` | Weekly rhythm (week glance, day detail, Later inbox, task board) |
+| `/runner/focus` | Focus Runner |
+| `/runner/recharge` | Recharge Runner |
+| `/runner/flex` | Flex Sprint |
+| `/runner/admin` | Admin Sprint |
+| `/week` | Weekly rhythm, Later inbox, task board |
 | `/sunday-setup` | Sunday Minimum — 4-step weekly planning flow |
 
 ---
@@ -151,12 +153,34 @@ Focus ritual items and timer lengths are stored on `UserPrefs.runnerSettings`, p
 - Ambient sound / haptics (optional per spec)
 - Web Workers for timers (timestamp approach used instead)
 - Later inbox **UI** (Stage 5)
-- Other themes (Recharge/Flex/Admin) log “runner not available” (Stage 6)
 - Mobile Focus Runner not started
 
 ---
 
-## Stage 5: Weekly View + Sunday Setup + Inbox — done (web)
+## Stage 6: All Runners + Sync — partial (web)
+
+### Implemented
+
+| Area | Location |
+|------|----------|
+| Recharge Runner | `app/runner/recharge/` — type select, ritual, optional timer, return ramp |
+| Flex Sprint | `app/runner/flex/` — zones, checklist, timer, next step |
+| Admin Sprint | `app/runner/admin/` — multi-category, checklist, timer, next step |
+| Today → all themes | `getRunnerPath()` in `packages/core/src/logic/runnerNavigation.ts` |
+| Shared sprint UI | `components/runner/shared/` — SprintTimer, SprintChecklist, NextStepCapture |
+| TanStack Query | `QueryProvider` in root layout; `useWeekPlan`, `useTasks` hooks |
+| Offline queue (foundation) | `lib/offlineQueue.ts`, `OfflineSyncListener` |
+
+### Gaps
+
+- Full optimistic updates + mutation hooks for all entities
+- Conflict resolution UI
+- Offline queue handlers (drain is stub)
+- Mobile runners not started
+
+---
+
+## Manual test checklist (Stages 3–6)
 
 ### Implemented
 
@@ -199,6 +223,10 @@ Prerequisites: Supabase project configured, `.env.local` in `apps/web`, schema f
 12. **Week — inbox:** Promote item to task; delete item; warning at 15+ items.
 13. **Week — tasks:** Move tasks between This Week / Today / Done columns.
 14. **Sunday Setup:** Complete 4 steps; new/updated `week_plans` row with outcomes.
+15. **Recharge:** Start from Recharge day → type → ritual → optional timer → return ramp.
+16. **Flex:** Zone select → sprint checklist + timer → next step capture.
+17. **Admin:** Multi-category → sprint → next step capture.
+18. **Today routing:** Each theme opens correct `/runner/*` path.
 
 ---
 

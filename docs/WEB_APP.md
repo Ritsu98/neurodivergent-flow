@@ -11,7 +11,10 @@ Quick reference for the Next.js web app (`apps/web`).
 | `/today` | `src/app/today/page.tsx` | Main daily hub |
 | `/week` | `src/app/week/page.tsx` | Weekly rhythm, Later inbox, task board |
 | `/sunday-setup` | `src/app/sunday-setup/page.tsx` | Sunday Minimum (4-step weekly planning) |
-| `/runner/focus` | `src/app/runner/focus/page.tsx` | Focus Runner (Suspense wrapper) |
+| `/runner/focus` | `src/app/runner/focus/page.tsx` | Focus Runner |
+| `/runner/recharge` | `src/app/runner/recharge/page.tsx` | Recharge Runner |
+| `/runner/flex` | `src/app/runner/flex/page.tsx` | Flex Sprint (`?duration=5` for return ramp) |
+| `/runner/admin` | `src/app/runner/admin/page.tsx` | Admin Sprint |
 
 Query params:
 
@@ -76,9 +79,16 @@ Open [http://localhost:3000/today](http://localhost:3000/today) after onboarding
 
 Pages use `const userId = 'temp-user-id'`. Replace with Supabase Auth session when Stage 1.3 auth is complete. Until then, seed test data for that user id or align RLS policies for local dev.
 
-## Starting Focus from Today
+## Starting runners from Today
 
-`PrimaryBlockCard` **Start** navigates to `/runner/focus` only when today's theme is `focus`. Other themes log to console until Stage 6 runners ship.
+`PrimaryBlockCard` **Start** uses `getRunnerPath(theme)` for all day themes:
+
+- `focus` → `/runner/focus`
+- `recharge` → `/runner/recharge`
+- `flex` → `/runner/flex`
+- `admin` → `/runner/admin`
+
+Optional `?taskId=` links hard-stop / next-step to a Today task.
 
 ## Week page tabs
 
