@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .high-contrast {
+    @apply bg-white;
+  }
+
+  .high-contrast .bg-surface {
+    @apply bg-white;
+  }
+
+  .high-contrast .text-text-secondary,
+  .high-contrast .text-text-muted {
+    @apply text-gray-800;
+  }
+
+  .high-contrast .border-gray-200,
+  .high-contrast .border-gray-300 {
+    border-color: #000000;
+  }
+}
+
+@layer components {
+  .tap-target {
+    @apply min-h-12 min-w-12;
+  }
+}

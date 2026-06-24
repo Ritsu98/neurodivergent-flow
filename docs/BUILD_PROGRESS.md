@@ -3,8 +3,8 @@
 Living record of MVP implementation status. Aligned with the stage plan in `PRODUCT_SPEC.md`.
 
 **Last updated:** 2026-06-04  
-**Current focus:** MVP web complete — Stage 8 buffer / mobile optional  
-**Primary platform:** Web (`apps/web`) — mobile scaffold exists, features not ported yet
+**Current focus:** Mobile M0 foundation complete — M1 onboarding next  
+**Primary platform:** Web MVP complete; mobile foundation in progress
 
 ---
 
@@ -19,6 +19,26 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | 5 | Weekly View + Sunday Setup + Inbox | Done (web) | Web |
 | 6 | All Runners + Sync | Partial (web) | Web — runners done; sync foundation |
 | 7 | Polish + Deploy | Done (web) | Web |
+| M0 | Mobile foundation | Done | Mobile — Expo Router, NativeWind, placeholders |
+| M1 | Onboarding | Done | Mobile — 5-step flow, prefs + week plan |
+| M2 | Today + energy | Done | Mobile — energy, primary block, Top 3, MVD |
+
+---
+
+## Mobile routes (M0 — placeholder)
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Redirect → onboarding or Today tab |
+| `/onboarding` | Welcome stub; dev skip to Today |
+| `/(tabs)/today` | Today placeholder |
+| `/(tabs)/week` | Week placeholder |
+| `/settings` | Settings stub (loads prefs when Supabase configured) |
+| `/sunday-setup` | Sunday Minimum placeholder |
+| `/runner/*` | Runner route stubs (focus, recharge, flex, admin) |
+
+Run: `pnpm --filter @neurodivergent-flow/mobile dev`  
+Env: copy `apps/mobile/.env.example` → `.env` with `EXPO_PUBLIC_SUPABASE_*` (same values as web).
 
 ---
 
