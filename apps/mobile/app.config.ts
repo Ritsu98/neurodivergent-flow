@@ -18,13 +18,24 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundColor: '#0ea5e9',
     },
   },
-  plugins: ['expo-router', 'expo-notifications'],
+  plugins: [
+    'expo-router',
+    [
+      'expo-notifications',
+      {
+        color: '#0ea5e9',
+      },
+    ],
+  ],
   experiments: {
     typedRoutes: true,
   },
   extra: {
     router: {
       origin: false,
+    },
+    eas: {
+      projectId: process.env.EAS_PROJECT_ID,
     },
   },
 });

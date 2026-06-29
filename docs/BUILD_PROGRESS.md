@@ -3,8 +3,8 @@
 Living record of MVP implementation status. Aligned with the stage plan in `PRODUCT_SPEC.md`.
 
 **Last updated:** 2026-06-04  
-**Current focus:** Mobile M0 foundation complete — M1 onboarding next  
-**Primary platform:** Web MVP complete; mobile foundation in progress
+**Current focus:** Mobile M7 — EAS build config + QA docs  
+**Primary platform:** Web MVP complete; mobile feature parity through M5, M6 partial
 
 ---
 
@@ -26,6 +26,18 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | M4 | Week + Sunday + Inbox | Done | Mobile — week glance, inbox, tasks, Sunday Setup |
 | M5 | Settings + a11y + notifications | Done | Mobile — toggles, Expo scheduling, deep links |
 | M6 | SQLite + sync | Partial | Mobile — local-first Today/Week reads, energy write queue |
+| M7 | EAS build + QA | Done (config) | `eas.json`, DEPLOYMENT mobile, `MOBILE_QA.md` |
+
+### Mobile known issues (MVP)
+
+- Auth: `temp-user-id` everywhere (no Supabase Auth UI on mobile)
+- M6 sync queue: energy upserts only; tasks/inbox/prefs still require network
+- No custom app icon / splash assets (Expo defaults)
+- Haptics on timer complete not implemented
+- PostHog analytics toggle saves pref but mobile does not send events yet
+- Push notifications: test on physical device only; simulators unreliable
+
+See `docs/MOBILE_QA.md` for full device test matrix.
 
 ---
 

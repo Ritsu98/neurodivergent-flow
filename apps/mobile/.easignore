@@ -1,0 +1,8 @@
+# EAS upload ignores — keeps build archives smaller
+.git
+**/.turbo
+**/node_modules
+apps/web
+docs
+*.md
+!apps/mobile/README.md

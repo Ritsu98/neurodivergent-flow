@@ -294,12 +294,12 @@ M7 EAS build + QA
 
 ### Tasks
 
-- [ ] Add `eas.json` (development, preview profiles).
-- [ ] Configure EAS secrets for Supabase env.
+- [x] Add `eas.json` (development, preview profiles).
+- [x] Configure EAS secrets for Supabase env.
 - [ ] `eas build --platform all` (preview).
 - [ ] Device QA matrix: 1 iOS + 1 Android physical device.
-- [ ] Run manual checklist (copy from `BUILD_PROGRESS.md` Stages 3–7, mobile-specific).
-- [ ] Document known issues in `BUILD_PROGRESS.md`.
+- [x] Run manual checklist (copy from `BUILD_PROGRESS.md` Stages 3–7, mobile-specific).
+- [x] Document known issues in `BUILD_PROGRESS.md`.
 
 ### Deliverables
 

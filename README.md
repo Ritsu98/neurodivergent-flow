@@ -98,6 +98,19 @@ pnpm --filter @neurodivergent-flow/web dev
 pnpm --filter @neurodivergent-flow/mobile dev
 ```
 
+### Mobile internal build (EAS)
+
+```bash
+cd apps/mobile
+pnpm exec eas login
+pnpm exec eas init          # one-time: links Expo project
+pnpm exec eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_URL --value "..."
+pnpm exec eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "..."
+pnpm run build:preview:android   # APK for device testing
+```
+
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) and [`docs/MOBILE_QA.md`](docs/MOBILE_QA.md).
+
 ## 📦 Available Scripts
 
 ### Root Level

@@ -25,14 +25,75 @@ pnpm --filter @neurodivergent-flow/web start
 3. Enable RLS policies as documented.
 4. Point Vercel env vars at the production project.
 
-## Mobile (EAS) — post-MVP
+## Mobile (EAS)
+
+Internal test builds use the **`preview`** profile (Android APK + iOS internal distribution).
+
+### Prerequisites
+
+- [Expo account](https://expo.dev/signup)
+- [EAS CLI](https://docs.expo.dev/build/setup/) (`pnpm --filter @neurodivergent-flow/mobile exec eas --version`)
+- Apple Developer account (iOS internal/ad hoc) and Google Play Console optional for APK sideload
+- Supabase project with schema from `docs/SUPABASE_SETUP.md`
+
+### One-time setup
 
 ```bash
 cd apps/mobile
-eas build --platform all
+
+# Link project to Expo (creates projectId in Expo dashboard)
+pnpm exec eas login
+pnpm exec eas init
+
+# Copy env template and fill Supabase keys
+cp .env.example .env
 ```
 
-Requires Expo account and `eas.json` configuration (not yet in repo).
+After `eas init`, add the project ID to `app.config.ts` `extra.eas.projectId` or set `EAS_PROJECT_ID` in EAS secrets.
+
+### EAS secrets (recommended)
+
+Set secrets in Expo dashboard or CLI — do not commit keys:
+
+```bash
+cd apps/mobile
+pnpm exec eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_URL --value "https://xxx.supabase.co"
+pnpm exec eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "your-anon-key"
+```
+
+These are injected at build time for `preview` / `production` profiles.
+
+### Local dev (no EAS)
+
+```bash
+pnpm --filter @neurodivergent-flow/mobile dev
+```
+
+Scan QR with Expo Go, or press `a` / `i` for emulator.
+
+### Internal preview build
+
+```bash
+cd apps/mobile
+pnpm run build:preview:android   # APK for sideload
+pnpm run build:preview:ios       # requires Apple credentials
+# or both:
+pnpm run build:preview
+```
+
+Download artifacts from the [Expo dashboard](https://expo.dev) when the build completes.
+
+### QA
+
+Run `docs/MOBILE_QA.md` on physical devices before sharing builds.
+
+### Profiles (`eas.json`)
+
+| Profile | Use |
+|---------|-----|
+| `development` | Internal channel; dev Supabase via env |
+| `preview` | **Default internal QA** — Android APK, iOS internal |
+| `production` | Store-ready (auto-increment version) |
 
 ## PWA icons
 
@@ -51,3 +112,5 @@ Until custom icons exist, the manifest references these paths; add simple brande
 - [ ] High contrast + reduced motion toggles
 - [ ] Analytics opt-in (no events without toggle)
 - [ ] Smoke test: onboarding → today → runner → week
+- [ ] Mobile EAS preview build installs on Android + iOS device
+- [ ] Mobile QA checklist (`docs/MOBILE_QA.md`) spot-checked
