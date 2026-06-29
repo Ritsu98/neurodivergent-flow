@@ -269,12 +269,12 @@ M7 EAS build + QA
 
 ### Tasks
 
-- [ ] Define SQLite schema mirroring Supabase tables used by MVP:
+- [x] Define SQLite schema mirroring Supabase tables used by MVP:
   - `user_prefs`, `week_plans`, `tasks`, `energy_logs`, `inbox_items`
-- [ ] Repository layer: read local first, write local + enqueue sync.
-- [ ] Port/enhance offline queue pattern from `apps/web/src/lib/offlineQueue.ts` for mobile.
+- [x] Repository layer: read local first, write local + enqueue sync.
+- [x] Port/enhance offline queue pattern from `apps/web/src/lib/offlineQueue.ts` for mobile.
 - [ ] TanStack Query hooks with `initialData` from SQLite.
-- [ ] Flush queue on `NetInfo` online + app foreground.
+- [x] Flush queue on `NetInfo` online + app foreground.
 - [ ] LWW conflict: `updatedAt` comparison (same rules as `PRODUCT_SPEC.md` §9).
 
 ### Deliverables

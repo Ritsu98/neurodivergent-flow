@@ -3,16 +3,18 @@ import type { DayThemeConfig, InboxItem, Task, TaskStatus, WeekPlan } from '@neu
 import { getTodayDayIndex, getWeekStartDate, swapDayThemes } from '@neurodivergent-flow/core';
 import {
   createTask,
-  getInboxItems,
-  getTasks,
-  getUserPrefs,
-  getWeekPlan,
   markInboxItemPromoted,
   softDeleteInboxItem,
   updateTask,
   updateWeekPlan,
 } from '@neurodivergent-flow/api';
 import { USER_ID } from '@/constants/user';
+import { hydrateWeekFromRemote } from '@/lib/localData';
+import { getLocalInboxItems } from '@/lib/sqlite/repositories/inbox';
+import { getLocalTasks, saveLocalTask } from '@/lib/sqlite/repositories/tasks';
+import { getLocalUserPrefs } from '@/lib/sqlite/repositories/userPrefs';
+import { getLocalWeekPlan, saveLocalWeekPlan } from '@/lib/sqlite/repositories/weekPlan';
+import { ensureLocalDatabase } from '@/lib/sqlite/db';
 
 export type WeekTab = 'week' | 'inbox' | 'tasks';
 
@@ -27,28 +29,31 @@ export function useWeekData() {
   const weekStart = getWeekStartDate();
   const todayIndex = getTodayDayIndex();
 
+  const applyLocalState = useCallback(() => {
+    ensureLocalDatabase();
+    setWeekPlan(getLocalWeekPlan(USER_ID, weekStart));
+    setInboxItems(getLocalInboxItems(USER_ID));
+    setTasks(getLocalTasks(USER_ID));
+
+    const prefs = getLocalUserPrefs(USER_ID);
+    const days = prefs?.workWindows?.flatMap((w) => w.days) ?? [];
+    setWorkWindowDays(days);
+    const ww = prefs?.workWindows?.[0];
+    setWorkWindowTime(ww ? `${ww.start} – ${ww.end}` : undefined);
+  }, [weekStart]);
+
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [plan, prefs, inbox, allTasks] = await Promise.all([
-        getWeekPlan(USER_ID, weekStart),
-        getUserPrefs(USER_ID),
-        getInboxItems(USER_ID),
-        getTasks(USER_ID),
-      ]);
-      setWeekPlan(plan);
-      setInboxItems(inbox);
-      setTasks(allTasks);
-      const days = prefs?.workWindows?.flatMap((w) => w.days) ?? [];
-      setWorkWindowDays(days);
-      const ww = prefs?.workWindows?.[0];
-      if (ww) setWorkWindowTime(`${ww.start} – ${ww.end}`);
+      applyLocalState();
+      await hydrateWeekFromRemote(USER_ID, weekStart);
+      applyLocalState();
     } catch (error) {
       console.error('Failed to load week data:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [weekStart]);
+  }, [applyLocalState, weekStart]);
 
   useEffect(() => {
     void loadData();
@@ -57,6 +62,7 @@ export function useWeekData() {
   const saveDayThemes = async (dayThemes: DayThemeConfig[]) => {
     if (!weekPlan) return;
     const updated = await updateWeekPlan(weekPlan.id, { dayThemes });
+    saveLocalWeekPlan(updated);
     setWeekPlan(updated);
   };
 
@@ -89,12 +95,14 @@ export function useWeekData() {
       status,
       isMvdEssential: false,
     });
+    saveLocalTask(task);
     await markInboxItemPromoted(item.id, task.id);
     await loadData();
   };
 
   const handleMoveTask = async (taskId: string, status: TaskStatus, day?: number) => {
-    await updateTask(taskId, { status, day });
+    const updated = await updateTask(taskId, { status, day });
+    saveLocalTask(updated);
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, status, day: day ?? t.day } : t))
     );

@@ -5,16 +5,18 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryProvider } from '@/providers/QueryProvider';
+import { LocalDbProvider } from '@/providers/LocalDbProvider';
 import { UserPrefsProvider } from '@/providers/UserPrefsProvider';
 import { AppEffects } from '@/components/providers/AppEffects';
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <QueryProvider>
-        <UserPrefsProvider>
-          <AppEffects />
-          <StatusBar style="auto" />
+      <LocalDbProvider>
+        <QueryProvider>
+          <UserPrefsProvider>
+            <AppEffects />
+            <StatusBar style="auto" />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="(tabs)" />
@@ -28,6 +30,7 @@ export default function RootLayout() {
           </Stack>
         </UserPrefsProvider>
       </QueryProvider>
+      </LocalDbProvider>
     </SafeAreaProvider>
   );
 }

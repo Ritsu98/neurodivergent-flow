@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { DayColor, DayTheme, Task, WeekPlan } from '@neurodivergent-flow/core';
-import {
-  getEnergyLog,
-  getTasks,
-  getUserPrefs,
-  getWeekPlan,
-  updateTask,
-  upsertEnergyLog,
-} from '@neurodivergent-flow/api';
+import { getTasks, getUserPrefs, updateTask } from '@neurodivergent-flow/api';
 import { USER_ID } from '@/constants/user';
+import { hydrateTodayFromRemote, saveEnergyLogLocalFirst } from '@/lib/localData';
+import { ensureLocalDatabase } from '@/lib/sqlite/db';
+import { getLocalEnergyLog } from '@/lib/sqlite/repositories/energyLog';
+import { getLocalUserPrefs } from '@/lib/sqlite/repositories/userPrefs';
+import { getLocalWeekPlan } from '@/lib/sqlite/repositories/weekPlan';
+import { getLocalTasks } from '@/lib/sqlite/repositories/tasks';
 import {
   dayColorFromEnergy,
   getCurrentWeekStartDate,
@@ -26,25 +25,34 @@ export function useTodayData() {
 
   const dayIndex = getTodayDayIndex();
   const today = getTodayDateString();
+  const weekStart = getCurrentWeekStartDate();
+
+  const applyLocalState = () => {
+    ensureLocalDatabase();
+    const localEnergy = getLocalEnergyLog(USER_ID, today, 'am');
+    if (localEnergy) {
+      setEnergyValue(localEnergy.value);
+      setDayColor(localEnergy.dayColor ?? dayColorFromEnergy(localEnergy.value));
+    }
+
+    const localPlan = getLocalWeekPlan(USER_ID, weekStart);
+    setWeekPlan(localPlan);
+
+    const localTasks = getLocalTasks(USER_ID).filter(
+      (t) => t.day === dayIndex && t.status === 'today'
+    );
+    setTasks(localTasks);
+
+    const localPrefs = getLocalUserPrefs(USER_ID);
+    setHasWorkWindow((localPrefs?.workWindows?.length ?? 0) > 0);
+  };
 
   const loadTodayData = async () => {
     try {
       setIsLoading(true);
-
-      const energyLog = await getEnergyLog(USER_ID, today, 'am');
-      if (energyLog) {
-        setEnergyValue(energyLog.value);
-        setDayColor(energyLog.dayColor);
-      }
-
-      const plan = await getWeekPlan(USER_ID, getCurrentWeekStartDate());
-      setWeekPlan(plan);
-
-      const todayTasks = await getTasks(USER_ID, { day: dayIndex, status: 'today' });
-      setTasks(todayTasks);
-
-      const userPrefs = await getUserPrefs(USER_ID);
-      setHasWorkWindow((userPrefs?.workWindows?.length ?? 0) > 0);
+      applyLocalState();
+      await hydrateTodayFromRemote(USER_ID, today, weekStart, dayIndex);
+      applyLocalState();
     } catch (error) {
       console.error('Failed to load today data:', error);
     } finally {
@@ -57,9 +65,9 @@ export function useTodayData() {
   }, []);
 
   const handleEnergySave = async (value: number) => {
-    await upsertEnergyLog(USER_ID, today, 'am', value);
     setEnergyValue(value);
     setDayColor(dayColorFromEnergy(value));
+    await saveEnergyLogLocalFirst(USER_ID, today, 'am', value);
   };
 
   const handleTaskComplete = async (taskId: string) => {
