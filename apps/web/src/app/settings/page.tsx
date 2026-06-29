@@ -6,10 +6,10 @@ import { useUserPrefsContext } from '@/components/providers/UserPrefsProvider';
 import { NOTIFICATION_PREF_KEYS } from '@neurodivergent-flow/core';
 import { upsertUserPrefs } from '@neurodivergent-flow/api';
 import { requestNotificationPermission } from '@/lib/webNotifications';
-
-const USER_ID = 'temp-user-id';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SettingsPage() {
+  const { userId, signOut } = useAuth();
   const { prefs, refreshPrefs } = useUserPrefsContext();
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -26,10 +26,11 @@ export default function SettingsPage() {
   const notif = prefs.notificationPreferences ?? {};
 
   const save = async (updates: Record<string, boolean>) => {
+    if (!userId) return;
     setIsSaving(true);
     setMessage('');
     try {
-      await upsertUserPrefs(USER_ID, {
+      await upsertUserPrefs(userId, {
         notificationPreferences: { ...notif, ...updates },
       });
       await refreshPrefs();
@@ -42,9 +43,10 @@ export default function SettingsPage() {
   };
 
   const saveAccessibility = async (field: 'highContrastEnabled' | 'reducedMotionEnabled', value: boolean) => {
+    if (!userId) return;
     setIsSaving(true);
     try {
-      await upsertUserPrefs(USER_ID, { [field]: value });
+      await upsertUserPrefs(userId, { [field]: value });
       await refreshPrefs();
     } finally {
       setIsSaving(false);
@@ -152,6 +154,19 @@ export default function SettingsPage() {
         </section>
 
         {message && <p className="text-sm text-text-secondary" role="status">{message}</p>}
+
+        <section className="rounded-lg bg-white p-6 shadow-sm" aria-labelledby="account-heading">
+          <h2 id="account-heading" className="text-lg font-semibold">
+            Account
+          </h2>
+          <button
+            type="button"
+            onClick={() => void signOut().then(() => { window.location.href = '/login'; })}
+            className="mt-4 min-h-12 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium"
+          >
+            Sign out
+          </button>
+        </section>
       </main>
     </div>
   );

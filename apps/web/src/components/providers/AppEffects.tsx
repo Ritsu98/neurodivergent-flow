@@ -6,10 +6,10 @@ import { getEnergyLog } from '@neurodivergent-flow/api';
 import type { DayColor } from '@neurodivergent-flow/core';
 import { scheduleDailyNotifications } from '@/lib/webNotifications';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
-
-const USER_ID = 'temp-user-id';
+import { useAuth } from '@/hooks/useAuth';
 
 export function AppEffects() {
+  const { userId } = useAuth();
   const { prefs, notificationPrefs } = useUserPrefsContext();
 
   useEffect(() => {
@@ -17,11 +17,13 @@ export function AppEffects() {
   }, []);
 
   useEffect(() => {
+    if (!userId) return;
+
     let cleanup = () => {};
     let cancelled = false;
 
     async function setup() {
-      const log = await getEnergyLog(USER_ID, new Date().toISOString().split('T')[0], 'am');
+      const log = await getEnergyLog(userId, new Date().toISOString().split('T')[0], 'am');
       if (cancelled) return;
       const dayColor = log?.dayColor as DayColor | undefined;
       cleanup = scheduleDailyNotifications(prefs, notificationPrefs, dayColor);
@@ -32,7 +34,7 @@ export function AppEffects() {
       cancelled = true;
       cleanup();
     };
-  }, [prefs, notificationPrefs]);
+  }, [userId, prefs, notificationPrefs]);
 
   return null;
 }

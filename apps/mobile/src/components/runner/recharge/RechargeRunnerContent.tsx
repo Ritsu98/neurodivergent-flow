@@ -12,8 +12,9 @@ import {
   getRechargeRunnerSettings,
   mergeRunnerSettings,
 } from '@neurodivergent-flow/core';
-import { getUserPrefs, upsertUserPrefs } from '@neurodivergent-flow/api';
-import { USER_ID } from '@/constants/user';
+import { getUserPrefs } from '@neurodivergent-flow/api';
+import { upsertUserPrefsLocalFirst } from '@/lib/localData';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { AppText } from '@/components/ui/Text';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -22,6 +23,7 @@ import { Card } from '@/components/ui/Card';
 type Phase = 'select' | 'ritual' | 'active' | 'return';
 
 export function RechargeRunnerContent() {
+  const { userId } = useAuth();
   const [phase, setPhase] = useState<Phase>('select');
   const [rechargeType, setRechargeType] = useState<RechargeType>('micro');
   const [ritualItems, setRitualItems] = useState<string[]>([]);
@@ -36,12 +38,13 @@ export function RechargeRunnerContent() {
   });
 
   useEffect(() => {
-    getUserPrefs(USER_ID).then((prefs) => {
+    if (!userId) return;
+    getUserPrefs(userId).then((prefs) => {
       const settings = getRechargeRunnerSettings(prefs);
       setRitualItems(settings.ritualItems);
       setIsLoading(false);
     });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (phase !== 'active' || !useTimer) return;
@@ -58,8 +61,9 @@ export function RechargeRunnerContent() {
   };
 
   const saveRitualItems = async (items: string[]) => {
-    const prefs = await getUserPrefs(USER_ID);
-    await upsertUserPrefs(USER_ID, {
+    if (!userId) return;
+    const prefs = await getUserPrefs(userId);
+    await upsertUserPrefsLocalFirst(userId, {
       runnerSettings: mergeRunnerSettings(prefs, { recharge: { ritualItems: items } }),
     });
   };

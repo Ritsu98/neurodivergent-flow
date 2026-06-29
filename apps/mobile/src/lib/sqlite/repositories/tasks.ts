@@ -27,3 +27,17 @@ export function saveLocalTasks(userId: string, tasks: Task[]): void {
 export function saveLocalTask(task: Task): void {
   saveLocalTasks(task.userId, [task]);
 }
+
+export function getLocalTask(taskId: string): Task | null {
+  const db = getDatabase();
+  const row = db.getFirstSync<{ data_json: string }>(
+    'SELECT data_json FROM tasks WHERE id = ?',
+    [taskId]
+  );
+  return row ? (JSON.parse(row.data_json) as Task) : null;
+}
+
+export function deleteLocalTask(taskId: string): void {
+  const db = getDatabase();
+  db.runSync('DELETE FROM tasks WHERE id = ?', [taskId]);
+}

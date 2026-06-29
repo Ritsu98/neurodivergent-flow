@@ -1160,11 +1160,11 @@ Updated after **Stages 3–4** (web). Full detail: [`docs/BUILD_PROGRESS.md`](do
 - [ ] Seed initial data (supplement templates)
 
 #### 1.3 Authentication
-- [ ] Set up Supabase Auth (email/password)
-- [ ] Create auth screens (sign up, sign in, password reset)
-- [ ] Implement auth state management (Zustand store)
-- [ ] Set up protected routes/guards
-- [ ] Test auth flow end-to-end
+- [x] Set up Supabase Auth (email/password)
+- [x] Create auth screens (sign up, sign in, password reset)
+- [x] Implement auth state management (Zustand store)
+- [x] Set up protected routes/guards
+- [ ] Test auth flow end-to-end (manual — requires Supabase project + env)
 
 #### 1.4 Shared Types & Schemas
 - [ ] Define TypeScript types in `packages/core/src/types/`:

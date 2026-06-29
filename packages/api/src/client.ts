@@ -1,5 +1,11 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+export interface AuthStorageAdapter {
+  getItem: (key: string) => Promise<string | null> | string | null;
+  setItem: (key: string, value: string) => Promise<void> | void;
+  removeItem: (key: string) => Promise<void> | void;
+}
+
 function getSupabaseConfig(): { url: string; key: string } {
   const url =
     process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -11,6 +17,15 @@ function getSupabaseConfig(): { url: string; key: string } {
 }
 
 let client: SupabaseClient | null = null;
+let authStorage: AuthStorageAdapter | undefined;
+
+/**
+ * Mobile: pass AsyncStorage adapter once at app startup so sessions persist.
+ */
+export function configureAuthStorage(storage: AuthStorageAdapter): void {
+  authStorage = storage;
+  client = null;
+}
 
 export function getSupabaseClient(): SupabaseClient {
   if (client) return client;
@@ -22,7 +37,20 @@ export function getSupabaseClient(): SupabaseClient {
     );
   }
 
-  client = createClient(url, key);
+  client = createClient(url, key, {
+    auth: authStorage
+      ? {
+          storage: authStorage,
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: false,
+        }
+      : {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: typeof window !== 'undefined',
+        },
+  });
   return client;
 }
 

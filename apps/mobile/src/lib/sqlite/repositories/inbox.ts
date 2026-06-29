@@ -10,6 +10,24 @@ export function getLocalInboxItems(userId: string): InboxItem[] {
   return rows.map((row) => JSON.parse(row.data_json) as InboxItem);
 }
 
+export function saveLocalInboxItem(item: InboxItem): void {
+  saveLocalInboxItems(item.userId, [item]);
+}
+
+export function deleteLocalInboxItem(inboxItemId: string): void {
+  const db = getDatabase();
+  db.runSync('DELETE FROM inbox_items WHERE id = ?', [inboxItemId]);
+}
+
+export function getLocalInboxItem(itemId: string): InboxItem | null {
+  const db = getDatabase();
+  const row = db.getFirstSync<{ data_json: string }>(
+    'SELECT data_json FROM inbox_items WHERE id = ?',
+    [itemId]
+  );
+  return row ? (JSON.parse(row.data_json) as InboxItem) : null;
+}
+
 export function saveLocalInboxItems(userId: string, items: InboxItem[]): void {
   const db = getDatabase();
   for (const item of items) {

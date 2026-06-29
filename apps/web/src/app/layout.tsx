@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { QueryProvider } from '@/components/providers/QueryProvider';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 import { UserPrefsProvider } from '@/components/providers/UserPrefsProvider';
 import { AppEffects } from '@/components/providers/AppEffects';
 
@@ -32,10 +33,12 @@ export default function RootLayout({
           Skip to main content
         </a>
         <QueryProvider>
-          <UserPrefsProvider>
-            <AppEffects />
-            {children}
-          </UserPrefsProvider>
+          <AuthProvider>
+            <UserPrefsProvider>
+              <AppEffects />
+              {children}
+            </UserPrefsProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

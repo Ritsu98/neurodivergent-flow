@@ -16,8 +16,7 @@ import {
 } from '@neurodivergent-flow/core';
 import { getUserPrefs } from '@neurodivergent-flow/api';
 import { initAnalytics, setAnalyticsEnabled } from '@/lib/analytics';
-
-const USER_ID = 'temp-user-id';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UserPrefsContextValue {
   prefs: UserPrefs | null;
@@ -30,12 +29,19 @@ interface UserPrefsContextValue {
 const UserPrefsContext = createContext<UserPrefsContextValue | null>(null);
 
 export function UserPrefsProvider({ children }: { children: ReactNode }) {
+  const { userId, isAuthenticated } = useAuth();
   const [prefs, setPrefs] = useState<UserPrefs | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshPrefs = useCallback(async () => {
+    if (!userId) {
+      setPrefs(null);
+      setIsLoading(false);
+      return;
+    }
     try {
-      const data = await getUserPrefs(USER_ID);
+      setIsLoading(true);
+      const data = await getUserPrefs(userId);
       setPrefs(data);
       const analyticsOn = isAnalyticsEnabled(data?.notificationPreferences);
       setAnalyticsEnabled(analyticsOn);
@@ -45,11 +51,16 @@ export function UserPrefsProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setPrefs(null);
+      setIsLoading(false);
+      return;
+    }
     void refreshPrefs();
-  }, [refreshPrefs]);
+  }, [isAuthenticated, refreshPrefs]);
 
   useEffect(() => {
     if (!prefs) return;

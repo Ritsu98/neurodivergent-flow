@@ -6,6 +6,7 @@ import { SleepWindowStep } from '@/components/onboarding/SleepWindowStep';
 import { IntensityStep } from '@/components/onboarding/IntensityStep';
 import { RechargeStep } from '@/components/onboarding/RechargeStep';
 import { SupplementsStep } from '@/components/onboarding/SupplementsStep';
+import { useAuth } from '@/hooks/useAuth';
 
 export type OnboardingData = {
   workMode: 'none' | 'weekdays' | 'irregular';
@@ -22,6 +23,7 @@ export type OnboardingData = {
 };
 
 export default function OnboardingPage() {
+  const { userId } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<Partial<OnboardingData>>({
     downshiftReminderEnabled: true,
@@ -51,11 +53,8 @@ export default function OnboardingPage() {
   };
 
   const handleComplete = async () => {
+    if (!userId) return;
     try {
-      // TODO: Get userId from auth (will be implemented in Stage 1.3)
-      const userId = 'temp-user-id'; // Replace with actual auth
-
-      // Save user preferences
       const { upsertUserPrefs } = await import('@neurodivergent-flow/api');
       await upsertUserPrefs(userId, {
         workMode: data.workMode!,

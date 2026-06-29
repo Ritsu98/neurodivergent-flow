@@ -13,8 +13,9 @@ import {
   ADMIN_TIMER_STORAGE_KEY,
   getTodayDayIndex,
 } from '@neurodivergent-flow/core';
-import { createInboxItem, getTasks, updateTask } from '@neurodivergent-flow/api';
-import { USER_ID } from '@/constants/user';
+import { getTasks } from '@neurodivergent-flow/api';
+import { createInboxItemLocalFirst, updateTaskLocalFirst } from '@/lib/localData';
+import { useAuth } from '@/hooks/useAuth';
 import { AppText } from '@/components/ui/Text';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
@@ -23,6 +24,7 @@ import { cn } from '@/lib/cn';
 type Phase = 'categories' | 'sprint' | 'complete';
 
 export function AdminRunnerContent() {
+  const { userId } = useAuth();
   const params = useLocalSearchParams<{ taskId?: string }>();
 
   const [phase, setPhase] = useState<Phase>('categories');
@@ -40,13 +42,12 @@ export function AdminRunnerContent() {
 
   useEffect(() => {
     const taskId = params.taskId;
-    if (taskId) {
-      const dayIndex = getTodayDayIndex();
-      getTasks(USER_ID, { day: dayIndex, status: 'today' }).then((tasks) => {
-        setActiveTask(tasks.find((t) => t.id === taskId) ?? null);
-      });
-    }
-  }, [params.taskId]);
+    if (!taskId || !userId) return;
+    const dayIndex = getTodayDayIndex();
+    getTasks(userId, { day: dayIndex, status: 'today' }).then((tasks) => {
+      setActiveTask(tasks.find((t) => t.id === taskId) ?? null);
+    });
+  }, [params.taskId, userId]);
 
   useEffect(() => {
     if (phase !== 'sprint') return;
@@ -73,10 +74,11 @@ export function AdminRunnerContent() {
   };
 
   const handleNextStep = async (nextStep: string, saveAs: 'task' | 'inbox' | 'skip') => {
+    if (!userId) return;
     if (saveAs === 'task' && nextStep && activeTask) {
-      await updateTask(activeTask.id, { nextStep });
+      await updateTaskLocalFirst(activeTask.id, { nextStep });
     } else if (saveAs === 'inbox' && nextStep) {
-      await createInboxItem(USER_ID, nextStep);
+      await createInboxItemLocalFirst(userId, nextStep);
     }
     router.replace('/(tabs)/today');
   };

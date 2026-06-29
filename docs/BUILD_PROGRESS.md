@@ -3,8 +3,8 @@
 Living record of MVP implementation status. Aligned with the stage plan in `PRODUCT_SPEC.md`.
 
 **Last updated:** 2026-06-04  
-**Current focus:** Mobile M7 — EAS build config + QA docs  
-**Primary platform:** Web MVP complete; mobile feature parity through M5, M6 partial
+**Current focus:** Stage 1.3 Auth complete — test sign-up against Supabase  
+**Primary platform:** Web + mobile MVP with Supabase Auth
 
 ---
 
@@ -12,7 +12,7 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 
 | Stage | Name | Status | Platform |
 |-------|------|--------|----------|
-| 1 | Foundation & Infrastructure | Partial | Web + monorepo |
+| 1 | Foundation & Infrastructure | Partial | Auth done (1.3); local-first web partial |
 | 2 | Onboarding Flow | Done (web) | Web |
 | 3 | Today Screen + Energy Logging | Done (web) | Web |
 | 4 | Focus Runner | Done (web) | Web |
@@ -25,13 +25,11 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | M3 | All runners | Done | Mobile — Focus, Recharge, Flex, Admin (no haptics yet) |
 | M4 | Week + Sunday + Inbox | Done | Mobile — week glance, inbox, tasks, Sunday Setup |
 | M5 | Settings + a11y + notifications | Done | Mobile — toggles, Expo scheduling, deep links |
-| M6 | SQLite + sync | Partial | Mobile — local-first Today/Week reads, energy write queue |
-| M7 | EAS build + QA | Done (config) | `eas.json`, DEPLOYMENT mobile, `MOBILE_QA.md` |
+| M6 | SQLite + sync | Done | Mobile — local-first reads/writes, full sync queue, LWW on hydrate |
+| M7 | EAS build + QA | Done (config) | `eas.json`, DEPLOYMENT mobile, `MOBILE_QA.md`; run `eas build` for APK/IPA |
 
 ### Mobile known issues (MVP)
 
-- Auth: `temp-user-id` everywhere (no Supabase Auth UI on mobile)
-- M6 sync queue: energy upserts only; tasks/inbox/prefs still require network
 - No custom app icon / splash assets (Expo defaults)
 - Haptics on timer complete not implemented
 - PostHog analytics toggle saves pref but mobile does not send events yet
@@ -115,7 +113,7 @@ Focus ritual items and timer lengths are stored on `UserPrefs.runnerSettings`, p
 
 ### Not done / deferred
 
-- Supabase Auth UI and protected routes (`userId` is still `'temp-user-id'` in web pages)
+- Supabase Auth UI on web and mobile; session drives `user_id` for RLS.
 - Zustand auth store
 - IndexedDB / SQLite local-first layer
 - Shared `ui` component library
@@ -270,7 +268,7 @@ Focus ritual items and timer lengths are stored on `UserPrefs.runnerSettings`, p
 
 ## Manual test checklist (Stages 3–7)
 
-Prerequisites: Supabase project configured, `.env.local` in `apps/web`, schema from `docs/SUPABASE_SETUP.md`, test user row matching `temp-user-id` or swap to real auth when available.
+Prerequisites: Supabase project configured (see `docs/SUPABASE_SETUP.md` §8), `.env.local` in `apps/web` and `apps/mobile/.env`, schema + RLS applied. Sign up via `/signup` or mobile auth screens.
 
 1. **Today — energy:** Move slider; confirm save (network tab → `energy_logs` upsert).
 2. **Today — Red day:** Set energy 0–1; MVD card shows; Top 3 shows MVD-only label.

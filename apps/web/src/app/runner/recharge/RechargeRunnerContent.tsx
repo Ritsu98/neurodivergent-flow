@@ -13,12 +13,13 @@ import {
   mergeRunnerSettings,
 } from '@neurodivergent-flow/core';
 import { getUserPrefs, upsertUserPrefs } from '@neurodivergent-flow/api';
+import { useAuth } from '@/hooks/useAuth';
 
-const USER_ID = 'temp-user-id';
 type Phase = 'select' | 'ritual' | 'active' | 'return';
 
 export function RechargeRunnerContent() {
   const router = useRouter();
+  const { userId } = useAuth();
   const [phase, setPhase] = useState<Phase>('select');
   const [rechargeType, setRechargeType] = useState<RechargeType>('micro');
   const [ritualItems, setRitualItems] = useState<string[]>([]);
@@ -33,7 +34,7 @@ export function RechargeRunnerContent() {
   });
 
   useEffect(() => {
-    getUserPrefs(USER_ID).then((prefs) => {
+    getUserPrefs(userId).then((prefs) => {
       const settings = getRechargeRunnerSettings(prefs);
       setRitualItems(settings.ritualItems);
       setIsLoading(false);
@@ -55,8 +56,8 @@ export function RechargeRunnerContent() {
   };
 
   const saveRitualItems = async (items: string[]) => {
-    const prefs = await getUserPrefs(USER_ID);
-    await upsertUserPrefs(USER_ID, {
+    const prefs = await getUserPrefs(userId);
+    await upsertUserPrefs(userId, {
       runnerSettings: mergeRunnerSettings(prefs, {
         recharge: { ritualItems: items },
       }),

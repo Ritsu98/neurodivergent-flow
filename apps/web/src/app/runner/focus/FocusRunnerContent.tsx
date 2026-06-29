@@ -22,12 +22,13 @@ import {
   getTasks,
 } from '@neurodivergent-flow/api';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
+import { useAuth } from '@/hooks/useAuth';
 
-const USER_ID = 'temp-user-id';
 const SESSION_LOG_KEY = 'nf_focus_session_log';
 
 export function FocusRunnerContent() {
   const router = useRouter();
+  const { userId } = useAuth();
   const searchParams = useSearchParams();
   const taskIdParam = searchParams.get('taskId');
 
@@ -75,14 +76,14 @@ export function FocusRunnerContent() {
   const loadRunnerData = async () => {
     try {
       setIsLoading(true);
-      const prefs = await getUserPrefs(USER_ID);
+      const prefs = await getUserPrefs(userId);
       const runnerSettings = getFocusRunnerSettings(prefs);
       setSettings(runnerSettings);
       setRitualItems(runnerSettings.focusRitualItems);
 
       if (taskIdParam) {
         const dayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-        const tasks = await getTasks(USER_ID, { day: dayIndex, status: 'today' });
+        const tasks = await getTasks(userId, { day: dayIndex, status: 'today' });
         setActiveTask(tasks.find((t) => t.id === taskIdParam) ?? null);
       }
     } catch (error) {
@@ -96,8 +97,8 @@ export function FocusRunnerContent() {
     setSettings(next);
     setRitualItems(next.focusRitualItems);
     try {
-      const prefs = await getUserPrefs(USER_ID);
-      await upsertUserPrefs(USER_ID, {
+      const prefs = await getUserPrefs(userId);
+      await upsertUserPrefs(userId, {
         runnerSettings: mergeRunnerSettings(prefs, { focus: next }),
       });
     } catch (error) {
@@ -140,7 +141,7 @@ export function FocusRunnerContent() {
         if (saveAs === 'task' && activeTask) {
           await updateTask(activeTask.id, { nextStep });
         } else {
-          await createInboxItem(USER_ID, nextStep);
+          await createInboxItem(userId, nextStep);
         }
       }
       logSessionComplete();
@@ -152,7 +153,7 @@ export function FocusRunnerContent() {
   };
 
   const handleLaterSave = async (content: string) => {
-    await createInboxItem(USER_ID, content);
+    await createInboxItem(userId, content);
   };
 
   const timerLabel =

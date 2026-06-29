@@ -14,12 +14,13 @@ import {
   getTodayDayIndex,
 } from '@neurodivergent-flow/core';
 import { createInboxItem, getTasks, updateTask } from '@neurodivergent-flow/api';
+import { useAuth } from '@/hooks/useAuth';
 
-const USER_ID = 'temp-user-id';
 type Phase = 'zone' | 'sprint' | 'complete';
 
 export function FlexRunnerContent() {
   const router = useRouter();
+  const { userId } = useAuth();
   const searchParams = useSearchParams();
   const presetDuration = searchParams.get('duration');
   const presetZone = searchParams.get('zone') as FlexZone | null;
@@ -46,7 +47,7 @@ export function FlexRunnerContent() {
     const taskId = searchParams.get('taskId');
     if (taskId) {
       const dayIndex = getTodayDayIndex();
-      getTasks(USER_ID, { day: dayIndex, status: 'today' }).then((tasks) => {
+      getTasks(userId, { day: dayIndex, status: 'today' }).then((tasks) => {
         setActiveTask(tasks.find((t) => t.id === taskId) ?? null);
       });
     }
@@ -69,7 +70,7 @@ export function FlexRunnerContent() {
     if (saveAs === 'task' && nextStep && activeTask) {
       await updateTask(activeTask.id, { nextStep });
     } else if (saveAs === 'inbox' && nextStep) {
-      await createInboxItem(USER_ID, nextStep);
+      await createInboxItem(userId, nextStep);
     }
     router.push('/today');
   };

@@ -22,11 +22,12 @@ import {
   createTask,
   updateTask,
 } from '@neurodivergent-flow/api';
+import { useAuth } from '@/hooks/useAuth';
 
-const USER_ID = 'temp-user-id';
 type Tab = 'week' | 'inbox' | 'tasks';
 
 export default function WeekPage() {
+  const { userId } = useAuth();
   const [tab, setTab] = useState<Tab>('week');
   const [weekPlan, setWeekPlan] = useState<WeekPlan | null>(null);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -40,13 +41,14 @@ export default function WeekPage() {
   const todayIndex = getTodayDayIndex();
 
   const loadData = useCallback(async () => {
+    if (!userId) return;
     try {
       setIsLoading(true);
       const [plan, prefs, inbox, allTasks] = await Promise.all([
-        getWeekPlan(USER_ID, weekStart),
-        getUserPrefs(USER_ID),
-        getInboxItems(USER_ID),
-        getTasks(USER_ID),
+        getWeekPlan(userId, weekStart),
+        getUserPrefs(userId),
+        getInboxItems(userId),
+        getTasks(userId),
       ]);
       setWeekPlan(plan);
       setInboxItems(inbox);
@@ -60,7 +62,7 @@ export default function WeekPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [weekStart]);
+  }, [userId, weekStart]);
 
   useEffect(() => {
     loadData();
@@ -94,7 +96,7 @@ export default function WeekPage() {
     status: TaskStatus
   ) => {
     const task = await createTask({
-      userId: USER_ID,
+      userId,
       weekPlanId: weekPlan?.id,
       title: item.content,
       day: day ?? undefined,

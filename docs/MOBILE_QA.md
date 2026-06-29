@@ -4,9 +4,9 @@ Manual test matrix for internal EAS builds (`preview` profile). Run on **one phy
 
 **Prerequisites**
 
-- Supabase project configured (`docs/SUPABASE_SETUP.md`)
+- Supabase project configured (`docs/SUPABASE_SETUP.md` §8 Auth setup)
 - `apps/mobile/.env` with `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-- Test user data for `temp-user-id` (or real auth when available)
+- Registered test user (sign up in app or Supabase dashboard)
 - Device notifications permission granted in Settings
 
 ---
@@ -63,8 +63,8 @@ Manual test matrix for internal EAS builds (`preview` profile). Run on **one phy
 
 ## Known limitations (MVP)
 
-- Auth is still `temp-user-id` — not production-ready RLS
-- M6 sync queue handles energy upserts only; other writes need network
+- [ ] Sign out clears session and returns to login
+- [ ] Offline airplane mode: complete task, capture Later item, change settings — all queue and sync on reconnect
 - Haptic feedback on timer complete not implemented
 - Custom app icon / splash assets not added (default Expo branding)
 - iOS internal distribution requires Apple Developer account + device UDIDs for ad hoc

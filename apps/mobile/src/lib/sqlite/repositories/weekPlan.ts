@@ -29,3 +29,17 @@ export function saveLocalWeekPlan(plan: WeekPlan): void {
     ]
   );
 }
+
+export function getLocalWeekPlanById(weekPlanId: string): WeekPlan | null {
+  const db = getDatabase();
+  const row = db.getFirstSync<{ data_json: string }>(
+    'SELECT data_json FROM week_plans WHERE id = ?',
+    [weekPlanId]
+  );
+  return row ? (JSON.parse(row.data_json) as WeekPlan) : null;
+}
+
+export function deleteLocalWeekPlan(weekPlanId: string): void {
+  const db = getDatabase();
+  db.runSync('DELETE FROM week_plans WHERE id = ?', [weekPlanId]);
+}

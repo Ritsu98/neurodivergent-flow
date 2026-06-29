@@ -4,24 +4,27 @@ import * as Notifications from 'expo-notifications';
 import { getEnergyLog } from '@neurodivergent-flow/api';
 import type { DayColor } from '@neurodivergent-flow/core';
 import { useUserPrefsContext } from '@/providers/UserPrefsProvider';
-import { USER_ID } from '@/constants/user';
+import { useAuth } from '@/hooks/useAuth';
 import { scheduleDailyNotifications } from '@/lib/notifications';
 
 export function AppEffects() {
+  const { userId } = useAuth();
   const { prefs, notificationPrefs } = useUserPrefsContext();
 
   useEffect(() => {
+    if (!userId) return;
+
     void (async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
-        const log = await getEnergyLog(USER_ID, today, 'am');
+        const log = await getEnergyLog(userId, today, 'am');
         const dayColor = log?.dayColor as DayColor | undefined;
         await scheduleDailyNotifications(prefs, notificationPrefs, dayColor);
       } catch (error) {
         console.error('Failed to schedule notifications:', error);
       }
     })();
-  }, [prefs, notificationPrefs]);
+  }, [userId, prefs, notificationPrefs]);
 
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {

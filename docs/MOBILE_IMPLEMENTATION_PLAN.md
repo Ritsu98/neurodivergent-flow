@@ -35,7 +35,7 @@ Aligned with `AGENTS.md`, `PRODUCT_SPEC.md`, and existing `packages/core` + `pac
 | `app.config.ts` | Replaces `app.json`; no missing asset refs |
 | NativeWind | `babel.config.js` configured; no `global.css` / entry wiring verified |
 | SQLite | `expo-sqlite` dependency; not implemented |
-| Auth | Not implemented (same gap as web — `temp-user-id`) |
+| Auth | Done | Supabase email/password; `(auth)` routes; AsyncStorage session |
 | Shared packages | `@neurodivergent-flow/core`, `@neurodivergent-flow/api` in deps |
 
 **Web reference map:**
@@ -130,7 +130,7 @@ M7 EAS build + QA
 - [x] Wire NativeWind v4: `global.css`, `metro.config.js`, verify shared `tailwind.config.ts` tokens render.
 - [x] Create `src/components/ui/`: `Button`, `Card`, `Text`, `Stack`, `Slider` (min 44×44 tap targets per `AGENTS.md`).
 - [x] Configure Supabase env: `app.config.ts` + `.env` / `EXPO_PUBLIC_*` vars.
-- [x] **Auth (minimal):** Supabase Auth email/password screens OR dev-mode `temp-user-id` with documented seed (match web until full auth).
+- [x] **Auth:** Supabase Auth email/password screens; session via `@supabase/ssr` (web) / AsyncStorage (mobile).
 - [x] Root providers: `QueryClientProvider`, `UserPrefsProvider` (port pattern from web).
 - [x] Tab shell with placeholder screens.
 
@@ -275,12 +275,12 @@ M7 EAS build + QA
 - [x] Port/enhance offline queue pattern from `apps/web/src/lib/offlineQueue.ts` for mobile.
 - [ ] TanStack Query hooks with `initialData` from SQLite.
 - [x] Flush queue on `NetInfo` online + app foreground.
-- [ ] LWW conflict: `updatedAt` comparison (same rules as `PRODUCT_SPEC.md` §9).
+- [x] LWW conflict: `updatedAt` comparison (same rules as `PRODUCT_SPEC.md` §9).
 
 ### Deliverables
 
-- App usable offline for Today read + energy write (queued).
-- Sync on reconnect without data loss for append-only logs.
+- App usable offline for Today/Week read and common writes (energy, tasks, inbox, prefs, week plan).
+- Sync on reconnect without data loss for queued mutations.
 
 ### Risks
 
@@ -325,12 +325,10 @@ M7 EAS build + QA
 - Required for offline commute / spotty connectivity.
 - **+1–2 weeks**
 
-### Phase C — Auth hardening
+### Phase C — Auth hardening (done)
 
-Can run in parallel with M1 or after M2:
-
-- Supabase Auth screens, session in SecureStore, replace `temp-user-id`.
-- Unblocks production RLS properly.
+- Supabase Auth on web + mobile; `session.user.id` replaces placeholder user id.
+- Optional follow-up: `expo-secure-store` for mobile session storage.
 
 ---
 

@@ -3,7 +3,7 @@ import { Alert, ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { generateWeekPlan } from '@neurodivergent-flow/core';
-import { createWeekPlan, upsertUserPrefs } from '@neurodivergent-flow/api';
+import { createWeekPlanLocalFirst, upsertUserPrefsLocalFirst } from '@/lib/localData';
 import { OnboardingProgress } from '@/components/onboarding/OnboardingProgress';
 import { WorkWindowStep } from '@/components/onboarding/WorkWindowStep';
 import { SleepWindowStep } from '@/components/onboarding/SleepWindowStep';
@@ -11,7 +11,7 @@ import { IntensityStep } from '@/components/onboarding/IntensityStep';
 import { RechargeStep } from '@/components/onboarding/RechargeStep';
 import { SupplementsStep } from '@/components/onboarding/SupplementsStep';
 import { Card } from '@/components/ui/Card';
-import { USER_ID } from '@/constants/user';
+import { useAuth } from '@/hooks/useAuth';
 import { setOnboardingComplete } from '@/lib/onboarding';
 import { getNextWeekStartDate } from '@/lib/weekStart';
 import type { OnboardingData } from '@/types/onboarding';
@@ -19,6 +19,7 @@ import type { OnboardingData } from '@/types/onboarding';
 const TOTAL_STEPS = 5;
 
 export default function OnboardingScreen() {
+  const { userId } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState<Partial<OnboardingData>>({
@@ -47,6 +48,7 @@ export default function OnboardingScreen() {
   };
 
   const handleComplete = async () => {
+    if (!userId) return;
     if (!data.workMode || !data.weekIntensity) {
       Alert.alert('Missing info', 'Please complete all required steps.');
       return;
@@ -54,7 +56,7 @@ export default function OnboardingScreen() {
 
     setSaving(true);
     try {
-      await upsertUserPrefs(USER_ID, {
+      await upsertUserPrefsLocalFirst(userId, {
         workMode: data.workMode,
         workWindows: data.workWindows,
         afterWorkEnergy: data.afterWorkEnergy,
@@ -72,8 +74,8 @@ export default function OnboardingScreen() {
         data.preferredPrimaryBlockTime
       );
 
-      await createWeekPlan({
-        userId: USER_ID,
+      await createWeekPlanLocalFirst({
+        userId: userId,
         startDate: getNextWeekStartDate(),
         intensity: data.weekIntensity,
         weeklyOutcomes: [],

@@ -75,9 +75,20 @@ pnpm --filter @neurodivergent-flow/web dev
 
 Open [http://localhost:3000/today](http://localhost:3000/today) after onboarding (or directly for UI work).
 
-## Temporary auth placeholder
+## Authentication
 
-Pages use `const userId = 'temp-user-id'`. Replace with Supabase Auth session when Stage 1.3 auth is complete. Until then, seed test data for that user id or align RLS policies for local dev.
+Supabase email/password auth (Stage 1.3):
+
+| Route | Purpose |
+|-------|---------|
+| `/login` | Sign in |
+| `/signup` | Create account (email confirmation if enabled in Supabase) |
+| `/reset-password` | Request reset or set new password after email link |
+| `/auth/callback` | OAuth/email confirmation callback |
+
+Protected routes (`/today`, `/week`, `/settings`, `/onboarding`, `/sunday-setup`, `/runner/*`) require a session. Middleware redirects unauthenticated users to `/login`.
+
+After sign-in, users without `user_prefs` are sent to `/onboarding`.
 
 ## Starting runners from Today
 

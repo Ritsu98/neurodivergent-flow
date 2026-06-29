@@ -8,19 +8,18 @@ import {
   getSundaySetupStartDate,
 } from '@neurodivergent-flow/core';
 import {
-  createWeekPlan,
-  getUserPrefs,
-  getWeekPlan,
-  updateWeekPlan,
-  upsertUserPrefs,
-} from '@neurodivergent-flow/api';
+  createWeekPlanLocalFirst,
+  updateWeekPlanLocalFirst,
+  upsertUserPrefsLocalFirst,
+} from '@/lib/localData';
+import { getUserPrefs, getWeekPlan } from '@neurodivergent-flow/api';
 import { OnboardingProgress } from '@/components/onboarding/OnboardingProgress';
 import { RadioOption } from '@/components/onboarding/RadioOption';
 import { StepActions } from '@/components/onboarding/StepActions';
 import { WeekPlanEditor } from '@/components/week/WeekPlanEditor';
 import { Card } from '@/components/ui/Card';
 import { AppText } from '@/components/ui/Text';
-import { USER_ID } from '@/constants/user';
+import { useAuth } from '@/hooks/useAuth';
 
 const TOTAL_STEPS = 4;
 
@@ -31,6 +30,7 @@ const intensityOptions: { value: WeekIntensity; title: string; desc: string }[] 
 ];
 
 export default function SundaySetupScreen() {
+  const { userId } = useAuth();
   const [step, setStep] = useState(1);
   const [intensity, setIntensity] = useState<WeekIntensity>('normal');
   const [dayThemes, setDayThemes] = useState<DayThemeConfig[]>([]);
@@ -39,7 +39,8 @@ export default function SundaySetupScreen() {
   const [isSaving, setIsSaving] = useState(false);
 
   const initPlan = async (selectedIntensity: WeekIntensity) => {
-    const prefs = await getUserPrefs(USER_ID);
+    if (!userId) return;
+    const prefs = await getUserPrefs(userId);
     const themes = generateWeekPlan(
       selectedIntensity,
       prefs?.workWindows,
@@ -56,22 +57,23 @@ export default function SundaySetupScreen() {
   };
 
   const handleComplete = async () => {
+    if (!userId) return;
     setIsSaving(true);
     try {
-      const prefs = await getUserPrefs(USER_ID);
+      const prefs = await getUserPrefs(userId);
       const startDate = getSundaySetupStartDate();
       const weeklyOutcomes = outcomes.map((o) => o.trim()).filter(Boolean);
 
-      const existing = await getWeekPlan(USER_ID, startDate);
+      const existing = await getWeekPlan(userId, startDate);
       if (existing) {
-        await updateWeekPlan(existing.id, {
+        await updateWeekPlanLocalFirst(existing.id, {
           intensity,
           dayThemes,
           weeklyOutcomes,
         });
       } else {
-        await createWeekPlan({
-          userId: USER_ID,
+        await createWeekPlanLocalFirst({
+          userId: userId,
           startDate,
           intensity,
           dayThemes,
@@ -80,7 +82,7 @@ export default function SundaySetupScreen() {
       }
 
       if (prefs) {
-        await upsertUserPrefs(USER_ID, { weekIntensityDefault: intensity });
+        await upsertUserPrefsLocalFirst(userId, { weekIntensityDefault: intensity });
       }
 
       router.replace('/(tabs)/today');

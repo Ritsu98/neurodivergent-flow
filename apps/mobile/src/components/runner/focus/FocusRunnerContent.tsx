@@ -14,14 +14,13 @@ import {
   getTodayDayIndex,
   mergeRunnerSettings,
 } from '@neurodivergent-flow/core';
+import { getTasks, getUserPrefs } from '@neurodivergent-flow/api';
 import {
-  createInboxItem,
-  getTasks,
-  getUserPrefs,
-  updateTask,
-  upsertUserPrefs,
-} from '@neurodivergent-flow/api';
-import { USER_ID } from '@/constants/user';
+  createInboxItemLocalFirst,
+  updateTaskLocalFirst,
+  upsertUserPrefsLocalFirst,
+} from '@/lib/localData';
+import { useAuth } from '@/hooks/useAuth';
 import { clearStoredTimerEnds } from '@/lib/timerStorage';
 import { AppText } from '@/components/ui/Text';
 
@@ -32,6 +31,7 @@ const FOCUS_TIMER_KEYS = [
 ];
 
 export function FocusRunnerContent() {
+  const { userId } = useAuth();
   const { taskId: taskIdParam } = useLocalSearchParams<{ taskId?: string }>();
 
   const [phase, setPhase] = useState<FocusRunnerPhase>('ritual');
@@ -76,16 +76,17 @@ export function FocusRunnerContent() {
   }, [phase]);
 
   const loadRunnerData = async () => {
+    if (!userId) return;
     try {
       setIsLoading(true);
-      const prefs = await getUserPrefs(USER_ID);
+      const prefs = await getUserPrefs(userId);
       const runnerSettings = getFocusRunnerSettings(prefs);
       setSettings(runnerSettings);
       setRitualItems(runnerSettings.focusRitualItems);
 
       if (taskIdParam) {
         const dayIndex = getTodayDayIndex();
-        const tasks = await getTasks(USER_ID, { day: dayIndex, status: 'today' });
+        const tasks = await getTasks(userId, { day: dayIndex, status: 'today' });
         setActiveTask(tasks.find((t) => t.id === taskIdParam) ?? null);
       }
     } catch (error) {
@@ -96,11 +97,12 @@ export function FocusRunnerContent() {
   };
 
   const saveRunnerSettings = async (next: FocusRunnerSettings) => {
+    if (!userId) return;
     setSettings(next);
     setRitualItems(next.focusRitualItems);
     try {
-      const prefs = await getUserPrefs(USER_ID);
-      await upsertUserPrefs(USER_ID, {
+      const prefs = await getUserPrefs(userId);
+      await upsertUserPrefsLocalFirst(userId, {
         runnerSettings: mergeRunnerSettings(prefs, { focus: next }),
       });
     } catch (error) {
@@ -125,12 +127,13 @@ export function FocusRunnerContent() {
     nextStep: string,
     saveAs: 'task' | 'inbox' | 'skip'
   ) => {
+    if (!userId) return;
     try {
       if (saveAs !== 'skip' && nextStep) {
         if (saveAs === 'task' && activeTask) {
-          await updateTask(activeTask.id, { nextStep });
+          await updateTaskLocalFirst(activeTask.id, { nextStep });
         } else {
-          await createInboxItem(USER_ID, nextStep);
+          await createInboxItemLocalFirst(userId, nextStep);
         }
       }
     } catch (error) {
@@ -140,7 +143,8 @@ export function FocusRunnerContent() {
   };
 
   const handleLaterSave = async (content: string) => {
-    await createInboxItem(USER_ID, content);
+    if (!userId) return;
+    await createInboxItemLocalFirst(userId, content);
   };
 
   const timerLabel =

@@ -590,23 +590,73 @@ Przed kontynuacją upewnij się, że:
 
 ---
 
-## 8. Następne kroki
+## 8. Authentication setup (Stage 1.3)
+
+After the database schema and RLS are in place, configure Supabase Auth so the app can sign users in. No additional SQL is required.
+
+### 8.1 Enable email/password provider
+
+1. In the Supabase dashboard, go to **Authentication → Providers → Email**.
+2. Ensure **Email** is enabled (default).
+3. **Confirm email** is on by default — Supabase sends a confirmation email on sign-up. Users must confirm before they can sign in. For faster local testing only, you may temporarily disable **Confirm email** (not recommended for production).
+
+No custom SMTP is required on the free tier for basic delivery; use Supabase's built-in email or configure custom SMTP later if needed.
+
+### 8.2 Redirect URLs
+
+Go to **Authentication → URL configuration**:
+
+| Setting | Value |
+|---------|--------|
+| **Site URL** | `http://localhost:3000` (dev) or your production web URL |
+| **Redirect URLs** | Add each of these (one per line or as allowed patterns): |
+
+```
+http://localhost:3000/**
+http://localhost:3000/auth/callback
+http://localhost:3000/reset-password
+neurodivergentflow://**
+```
+
+- **Web:** `/auth/callback` handles email confirmation and auth callbacks; `/reset-password` is the password-reset landing page.
+- **Mobile (Expo):** `neurodivergentflow://**` matches the app scheme in `apps/mobile/app.config.ts` for deep links.
+
+Replace `localhost:3000` with your deployed web URL when you deploy.
+
+### 8.3 Environment variables (unchanged)
+
+The app uses the same **Project URL** and **anon key** as in section 5. Auth sessions are issued by Supabase; no separate auth env vars are needed.
+
+### 8.4 How auth connects to RLS
+
+- On sign-up, Supabase creates a row in `auth.users`.
+- On sign-in, the client sends a JWT; `auth.uid()` in RLS policies matches the signed-in user's id.
+- App code uses `session.user.id` as `user_id` when writing to `user_prefs`, `week_plans`, `tasks`, etc.
+
+If you see **permission denied** after implementing auth, verify the user is signed in and that `user_id` in requests equals `auth.uid()`.
+
+### 8.5 Optional: disable email confirmation (dev only)
+
+**Authentication → Providers → Email → Confirm email** → off.
+
+Sign-up will return an active session immediately. Re-enable before production.
+
+---
+
+## 9. Następne kroki
 
 Po zakończeniu setupu Supabase:
 
-1. **Implementuj Authentication** (Stage 1.3)
-   - Supabase Auth (email/password)
-   - Ekrany logowania/rejestracji
-   - Zarządzanie stanem auth
-
+1. **Uruchom aplikację** — ekrany logowania/rejestracji (Stage 1.3) są w repozytorium.
 2. **Testuj onboarding end-to-end**
-   - Zarejestruj użytkownika
+   - Zarejestruj użytkownika (potwierdź email, jeśli włączone)
+   - Zaloguj się
    - Przejdź przez onboarding
    - Sprawdź, czy dane zapisują się w bazie
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 ### Problem: "relation does not exist"
 - **Rozwiązanie:** Upewnij się, że wykonałeś wszystkie SQL w kolejności
@@ -625,7 +675,7 @@ Po zakończeniu setupu Supabase:
 
 ---
 
-## 10. Przydatne linki
+## 11. Przydatne linki
 
 - [Supabase Documentation](https://supabase.com/docs)
 - [Row Level Security Guide](https://supabase.com/docs/guides/auth/row-level-security)

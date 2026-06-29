@@ -3,15 +3,16 @@ import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NOTIFICATION_PREF_KEYS } from '@neurodivergent-flow/core';
-import { upsertUserPrefs } from '@neurodivergent-flow/api';
+import { upsertUserPrefsLocalFirst } from '@/lib/localData';
 import { SettingsToggleRow } from '@/components/settings/SettingsToggleRow';
 import { Button, Card, AppText, Stack } from '@/components/ui';
-import { USER_ID } from '@/constants/user';
+import { useAuth } from '@/hooks/useAuth';
 import { requestNotificationPermission } from '@/lib/notifications';
 import { useUserPrefsContext } from '@/providers/UserPrefsProvider';
 
 export default function SettingsScreen() {
   const { prefs, refreshPrefs, isLoading } = useUserPrefsContext();
+  const { userId, signOut } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -29,10 +30,11 @@ export default function SettingsScreen() {
   const notif = prefs.notificationPreferences ?? {};
 
   const saveNotif = async (updates: Record<string, boolean>) => {
+    if (!userId) return;
     setIsSaving(true);
     setMessage('');
     try {
-      await upsertUserPrefs(USER_ID, {
+      await upsertUserPrefsLocalFirst(userId, {
         notificationPreferences: { ...notif, ...updates },
       });
       await refreshPrefs();
@@ -48,9 +50,10 @@ export default function SettingsScreen() {
     field: 'highContrastEnabled' | 'reducedMotionEnabled',
     value: boolean
   ) => {
+    if (!userId) return;
     setIsSaving(true);
     try {
-      await upsertUserPrefs(USER_ID, { [field]: value });
+      await upsertUserPrefsLocalFirst(userId, { [field]: value });
       await refreshPrefs();
     } finally {
       setIsSaving(false);
@@ -148,6 +151,17 @@ export default function SettingsScreen() {
               {message}
             </AppText>
           ) : null}
+
+          <Card>
+            <AppText variant="subtitle">Account</AppText>
+            <Button
+              label="Sign out"
+              variant="secondary"
+              onPress={() => void signOut().then(() => router.replace('/(auth)/login'))}
+              disabled={isSaving}
+              className="mt-4"
+            />
+          </Card>
 
           <Button label="Back" variant="secondary" onPress={() => router.back()} />
         </Stack>

@@ -20,9 +20,11 @@ import {
   updateTask,
 } from '@neurodivergent-flow/api';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function TodayPage() {
   const router = useRouter();
+  const { userId } = useAuth();
   const [energyValue, setEnergyValue] = useState<number | undefined>(undefined);
   const [dayColor, setDayColor] = useState<DayColor | undefined>(undefined);
   const [weekPlan, setWeekPlan] = useState<WeekPlan | null>(null);
@@ -32,16 +34,17 @@ export default function TodayPage() {
   const [hasWorkWindow, setHasWorkWindow] = useState(false);
 
   // TODO: Get from auth (Stage 1.3)
-  const userId = 'temp-user-id';
   const today = new Date().toISOString().split('T')[0];
   const dayOfWeek = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
   const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0-6 (Mon-Sun)
 
   useEffect(() => {
+    if (!userId) return;
     loadTodayData();
-  }, []);
+  }, [userId]);
 
   const loadTodayData = async () => {
+    if (!userId) return;
     try {
       setIsLoading(true);
 

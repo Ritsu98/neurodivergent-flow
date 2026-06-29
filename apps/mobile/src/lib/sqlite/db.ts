@@ -35,3 +35,16 @@ export function initLocalDatabase(): void {
 
   initialized = true;
 }
+
+/** Clear all local user data on sign-out (prevents cross-account leakage). */
+export function clearLocalDatabase(): void {
+  if (!database) return;
+  database.execSync(`
+    DELETE FROM sync_queue;
+    DELETE FROM energy_logs;
+    DELETE FROM user_prefs;
+    DELETE FROM week_plans;
+    DELETE FROM tasks;
+    DELETE FROM inbox_items;
+  `);
+}

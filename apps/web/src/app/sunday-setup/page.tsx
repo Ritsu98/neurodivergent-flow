@@ -13,8 +13,8 @@ import {
   updateWeekPlan,
 } from '@neurodivergent-flow/api';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
+import { useAuth } from '@/hooks/useAuth';
 
-const USER_ID = 'temp-user-id';
 const TOTAL_STEPS = 4;
 
 const intensityOptions: { value: WeekIntensity; title: string; desc: string }[] = [
@@ -25,6 +25,7 @@ const intensityOptions: { value: WeekIntensity; title: string; desc: string }[] 
 
 export default function SundaySetupPage() {
   const router = useRouter();
+  const { userId } = useAuth();
   const [step, setStep] = useState(1);
   const [intensity, setIntensity] = useState<WeekIntensity>('normal');
   const [dayThemes, setDayThemes] = useState<DayThemeConfig[]>([]);
@@ -33,7 +34,7 @@ export default function SundaySetupPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const initPlan = async (selectedIntensity: WeekIntensity) => {
-    const prefs = await getUserPrefs(USER_ID);
+    const prefs = await getUserPrefs(userId);
     const themes = generateWeekPlan(
       selectedIntensity,
       prefs?.workWindows,
@@ -56,11 +57,11 @@ export default function SundaySetupPage() {
   const handleComplete = async () => {
     setIsSaving(true);
     try {
-      const prefs = await getUserPrefs(USER_ID);
+      const prefs = await getUserPrefs(userId);
       const startDate = getSundaySetupStartDate();
       const weeklyOutcomes = outcomes.map((o) => o.trim()).filter(Boolean);
 
-      const existing = await getWeekPlan(USER_ID, startDate);
+      const existing = await getWeekPlan(userId, startDate);
       if (existing) {
         await updateWeekPlan(existing.id, {
           intensity,
@@ -69,7 +70,7 @@ export default function SundaySetupPage() {
         });
       } else {
         await createWeekPlan({
-          userId: USER_ID,
+          userId: userId,
           startDate,
           intensity,
           dayThemes,
@@ -79,7 +80,7 @@ export default function SundaySetupPage() {
 
       if (prefs) {
         await import('@neurodivergent-flow/api').then(({ upsertUserPrefs }) =>
-          upsertUserPrefs(USER_ID, { weekIntensityDefault: intensity })
+          upsertUserPrefs(userId, { weekIntensityDefault: intensity })
         );
       }
 
