@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { View } from 'react-native';
 import type { UserPrefs } from '@neurodivergent-flow/core';
-import { parseNotificationPrefs, type NotificationPrefs } from '@neurodivergent-flow/core';
+import { parseNotificationPrefs, isAnalyticsEnabled, type NotificationPrefs } from '@neurodivergent-flow/core';
 import { getUserPrefs } from '@neurodivergent-flow/api';
 import { USER_ID } from '@/constants/user';
 import { cn } from '@/lib/cn';
@@ -16,6 +16,7 @@ import { cn } from '@/lib/cn';
 interface UserPrefsContextValue {
   prefs: UserPrefs | null;
   notificationPrefs: NotificationPrefs;
+  analyticsEnabled: boolean;
   isLoading: boolean;
   refreshPrefs: () => Promise<void>;
 }
@@ -42,6 +43,7 @@ export function UserPrefsProvider({ children }: { children: ReactNode }) {
   }, [refreshPrefs]);
 
   const notificationPrefs = parseNotificationPrefs(prefs?.notificationPreferences);
+  const analyticsEnabled = isAnalyticsEnabled(prefs?.notificationPreferences);
 
   const rootClassName = cn(
     'flex-1 bg-gray-50',
@@ -54,6 +56,7 @@ export function UserPrefsProvider({ children }: { children: ReactNode }) {
       value={{
         prefs,
         notificationPrefs,
+        analyticsEnabled,
         isLoading,
         refreshPrefs,
       }}

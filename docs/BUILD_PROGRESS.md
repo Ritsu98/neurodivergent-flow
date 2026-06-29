@@ -24,6 +24,7 @@ Living record of MVP implementation status. Aligned with the stage plan in `PROD
 | M2 | Today + energy | Done | Mobile — energy, primary block, Top 3, MVD |
 | M3 | All runners | Done | Mobile — Focus, Recharge, Flex, Admin (no haptics yet) |
 | M4 | Week + Sunday + Inbox | Done | Mobile — week glance, inbox, tasks, Sunday Setup |
+| M5 | Settings + a11y + notifications | Done | Mobile — toggles, Expo scheduling, deep links |
 
 ---
 

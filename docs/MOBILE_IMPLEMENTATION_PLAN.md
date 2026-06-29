@@ -246,15 +246,15 @@ M7 EAS build + QA
 
 ### Tasks
 
-- [ ] Settings screen: high contrast, reduced motion, notification toggles, analytics opt-in.
-- [ ] Apply `high-contrast` / `reduced-motion` via NativeWind + context (port `UserPrefsProvider` behavior).
-- [ ] **Expo Notifications:**
+- [x] Settings screen: high contrast, reduced motion, notification toggles, analytics opt-in.
+- [x] Apply `high-contrast` / `reduced-motion` via NativeWind + context (port `UserPrefsProvider` behavior).
+- [x] **Expo Notifications:**
   - Request permissions.
   - Schedule downshift + Primary Block reminders (`packages/core` `notifications.ts` policy).
   - Red day suppression + max 2/day.
   - Optional: notification categories with actions (“Start Focus”) — deep link to runner.
-- [ ] Analytics opt-in (same PostHog fetch approach as web, or defer).
-- [ ] VoiceOver / TalkBack: `accessibilityLabel` on sliders, buttons, tab bar.
+- [x] Analytics opt-in (same PostHog fetch approach as web, or defer).
+- [x] VoiceOver / TalkBack: `accessibilityLabel` on sliders, buttons, tab bar.
 
 ### Testing
 

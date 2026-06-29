@@ -20,6 +20,11 @@
   .high-contrast .border-gray-300 {
     border-color: #000000;
   }
+
+  .reduced-motion * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @layer components {
